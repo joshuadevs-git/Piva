@@ -2,589 +2,407 @@
 <html lang="en" class="scroll-smooth">
 <head>
     <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>PIVA — Quantum Spatial & 8D Multidimensional Architecture</title>
-    
-    <!-- Google Fonts -->
+    <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+    <title>PIVA — 3D Digital Experience Studio</title>
+
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-    <link rel="icon" type="image/x-icon" href="favicon.ico">
-    <link rel="stylesheet" href="./css/tailwind.css">
-    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&family=Space+Grotesk:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&family=Space+Grotesk:wght@400;500;600;700&display=swap" rel="stylesheet">
 
-    <!-- FontAwesome Icons -->
-    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css">
+    <script src="https://cdn.tailwindcss.com"></script>
+    <script>
+      tailwind.config = {
+        theme: {
+          extend: {
+            fontFamily: { sans: ['Inter','sans-serif'], heading: ['Space Grotesk','sans-serif'] }
+          }
+        }
+      }
+    </script>
 
-    <!-- Three.js & GSAP + ScrollTrigger -->
+    <!-- Font Awesome (SVG/JS build — no external stylesheet needed) -->
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/js/all.min.js"></script>
+
     <script src="https://cdnjs.cloudflare.com/ajax/libs/three.js/r128/three.min.js"></script>
     <script src="https://cdnjs.cloudflare.com/ajax/libs/gsap/3.12.5/gsap.min.js"></script>
     <script src="https://cdnjs.cloudflare.com/ajax/libs/gsap/3.12.5/ScrollTrigger.min.js"></script>
 
     <style>
-        body {
-            background-color: #020308;
-            color: #f8fafc;
-            overflow-x: hidden;
-            font-feature-settings: "cv02", "cv03", "cv04", "cv11";
+        :root{ --accent:#be185d; --accent-2:#4c1d95; box-sizing:border-box; padding-top:env(safe-area-inset-top,0px); padding-bottom:env(safe-area-inset-bottom,0px); }
+        html{ scroll-padding-top:env(safe-area-inset-top,0px); }
+        body{
+            background-color:#05060a;
+            background-image:
+                radial-gradient(ellipse 65% 55% at 12% 18%, rgba(190,24,93,0.14), transparent 60%),
+                radial-gradient(ellipse 60% 50% at 88% 15%, rgba(76,29,149,0.14), transparent 60%),
+                radial-gradient(ellipse 70% 60% at 50% 100%, rgba(76,29,149,0.12), transparent 65%);
+            background-attachment:fixed;
+            color:#eef1f6;
+            overflow-x:hidden;
         }
 
-        /* 3D WebGL Canvas Layer */
-        #webgl-container {
-            position: fixed;
-            top: 0;
-            left: 0;
-            width: 100vw;
-            height: 100vh;
-            z-index: 0;
-            pointer-events: none;
-            mix-blend-mode: screen;
+        #webgl-container{
+            position:fixed; inset:0; width:100vw; height:100vh;
+            z-index:0; pointer-events:none; mix-blend-mode:screen;
         }
 
-        /* Mouse Liquid Cursor Glow */
-        #cursor-glow {
-            position: fixed;
-            width: 500px;
-            height: 500px;
-            border-radius: 50%;
-            background: radial-gradient(circle, rgba(0, 242, 254, 0.08) 0%, rgba(138, 43, 226, 0.05) 40%, rgba(0,0,0,0) 70%);
-            pointer-events: none;
-            z-index: 1;
-            transform: translate(-50%, -50%);
-            transition: width 0.3s, height 0.3s;
-            will-change: transform;
+        #vignette{
+            position:fixed; inset:0; z-index:1; pointer-events:none;
+            background:radial-gradient(ellipse at center, transparent 45%, rgba(5,6,10,0.55) 100%);
         }
 
-        /* 8D Glassmorphic Cards */
-        .glass-panel {
-            background: rgba(10, 14, 26, 0.55);
-            backdrop-filter: blur(24px);
-            -webkit-backdrop-filter: blur(24px);
-            border: 1px solid rgba(255, 255, 255, 0.07);
-            box-shadow: 0 20px 50px rgba(0, 0, 0, 0.5);
-            transition: all 0.5s cubic-bezier(0.16, 1, 0.3, 1);
-            position: relative;
-            overflow: hidden;
+        #cursor-glow{
+            position:fixed; width:480px; height:480px; border-radius:50%;
+            background:radial-gradient(circle, rgba(190,24,93,0.08) 0%, rgba(76,29,149,0.06) 45%, rgba(0,0,0,0) 70%);
+            pointer-events:none; z-index:2; transform:translate(-50%,-50%);
+            transition:opacity .3s; will-change:transform;
         }
 
-        .glass-panel::before {
-            content: '';
-            position: absolute;
-            top: 0;
-            left: -100%;
-            width: 100%;
-            height: 100%;
-            background: linear-gradient(90deg, transparent, rgba(255, 255, 255, 0.05), transparent);
-            transition: left 0.7s ease;
+        .glass-panel{
+            background:rgba(255,255,255,0.035);
+            backdrop-filter:blur(20px);
+            -webkit-backdrop-filter:blur(20px);
+            border:1px solid rgba(255,255,255,0.08);
+            transition:border-color .4s ease, transform .4s ease, box-shadow .4s ease;
+        }
+        .glass-panel:hover{
+            border-color:rgba(190,24,93,0.35);
+            box-shadow:0 20px 50px rgba(0,0,0,0.35);
+            transform:translateY(-3px);
         }
 
-        .glass-panel:hover::before {
-            left: 100%;
+        .glass-nav{
+            background:rgba(5,6,10,0.78);
+            backdrop-filter:blur(20px);
+            -webkit-backdrop-filter:blur(20px);
+            border-bottom:1px solid rgba(255,255,255,0.06);
+            padding-top:env(safe-area-inset-top,0px);
         }
 
-        .glass-panel:hover {
-            border-color: rgba(0, 242, 254, 0.35);
-            box-shadow: 0 20px 60px rgba(0, 242, 254, 0.12), inset 0 0 20px rgba(0, 242, 254, 0.05);
-            transform: translateY(-6px) scale(1.01);
+        .text-gradient{
+            background:linear-gradient(100deg, var(--accent) 0%, var(--accent-2) 100%);
+            -webkit-background-clip:text; background-clip:text; -webkit-text-fill-color:transparent;
         }
 
-        .glass-nav {
-            background: rgba(2, 3, 8, 0.75);
-            backdrop-filter: blur(24px);
-            -webkit-backdrop-filter: blur(24px);
-            border-bottom: 1px solid rgba(255, 255, 255, 0.06);
+        .btn-primary{
+            background:linear-gradient(100deg, var(--accent) 0%, var(--accent-2) 100%);
+            transition:filter .3s ease, transform .3s ease;
         }
+        .btn-primary:hover{ filter:brightness(1.12); transform:translateY(-1px); }
 
-        /* Multi-Gradient Text */
-        .text-gradient-8d {
-            background: linear-gradient(135deg, #ffffff 0%, #00f2fe 30%, #8a2be2 70%, #f59e0b 100%);
-            background-size: 200% auto;
-            -webkit-background-clip: text;
-            -webkit-text-fill-color: transparent;
-            animation: shineText 8s linear infinite;
+        .btn-outline{
+            border:1px solid rgba(255,255,255,0.16);
+            transition:border-color .3s ease, background .3s ease;
         }
+        .btn-outline:hover{ border-color:rgba(190,24,93,0.5); background:rgba(255,255,255,0.04); }
 
-        @keyframes shineText {
-            to { background-position: 200% center; }
-        }
+        ::-webkit-scrollbar{ width:6px; }
+        ::-webkit-scrollbar-track{ background:#05060a; }
+        ::-webkit-scrollbar-thumb{ background:#1e2433; border-radius:3px; }
+        ::-webkit-scrollbar-thumb:hover{ background:var(--accent); }
 
-        .btn-8d {
-            background: linear-gradient(135deg, rgba(0,242,254,0.1) 0%, rgba(138,43,226,0.2) 100%);
-            border: 1px solid rgba(0, 242, 254, 0.4);
-            box-shadow: 0 0 25px rgba(0, 242, 254, 0.15);
-            transition: all 0.4s ease;
-        }
-
-        .btn-8d:hover {
-            background: linear-gradient(135deg, rgba(0,242,254,0.3) 0%, rgba(138,43,226,0.5) 100%);
-            border-color: rgba(0, 242, 254, 0.8);
-            box-shadow: 0 0 35px rgba(0, 242, 254, 0.35);
-            transform: translateY(-2px);
-        }
-
-        /* Grid lines overlay */
-        .bg-grid-pattern {
-            background-size: 50px 50px;
-            background-image: 
-                linear-gradient(to right, rgba(255, 255, 255, 0.02) 1px, transparent 1px),
-                linear-gradient(to bottom, rgba(255, 255, 255, 0.02) 1px, transparent 1px);
-        }
-
-        /* Smooth scrollbar */
-        ::-webkit-scrollbar { width: 6px; }
-        ::-webkit-scrollbar-track { background: #020308; }
-        ::-webkit-scrollbar-thumb { background: #1e293b; border-radius: 3px; }
-        ::-webkit-scrollbar-thumb:hover { background: #00f2fe; }
+        input:focus, select:focus, textarea:focus{ border-color:var(--accent) !important; }
     </style>
 </head>
-<body class="font-sans antialiased text-slate-100 bg-obsidian bg-grid-pattern selection:bg-cyan-500 selection:text-black">
+<body class="font-sans antialiased selection:bg-pink-700 selection:text-white">
 
-    <!-- 3D Canvas Layer -->
     <div id="webgl-container"></div>
-
-    <!-- Mouse Parallax Liquid Cursor -->
+    <div id="vignette"></div>
     <div id="cursor-glow"></div>
 
-    <!-- Navigation Bar -->
-    <header class="fixed top-0 left-0 w-full z-50 glass-nav transition-all duration-300">
+    <!-- NAV -->
+    <header class="fixed top-0 left-0 w-full z-50 glass-nav">
         <div class="max-w-7xl mx-auto px-6 py-4 flex items-center justify-between">
-            <!-- Brand Logo -->
-            <a href="#" class="flex items-center gap-3 group">
-                <!-- <div class="relative w-10 h-10 rounded-xl bg-slate-900 border border-cyan-500/40 flex items-center justify-center font-black text-xl text-white group-hover:border-cyan-400 transition-colors shadow-lg shadow-cyan-500/10">
-                    <span class="text-gradient-8d font-heading"></span>
-                    <span class="absolute -top-1 -right-1 w-2.5 h-2.5 rounded-full bg-cyan-400 animate-ping"></span>
-                </div> -->
-                <div class="flex flex-col">
-                    <span class="font-heading font-extrabold text-2xl tracking-widest text-white leading-none">PIVA<span class="text-cyan-400"></span></span>
-                    <span class="text-[9px] tracking-widest text-slate-400 font-mono uppercase"></span>
-                </div>
+            <a href="#" class="flex items-center gap-2.5">
+                <div class="w-8 h-8 rounded-lg bg-white/5 border border-white/10 flex items-center justify-center font-heading font-bold text-sm text-white">P</div>
+                <span class="font-heading font-bold text-lg tracking-tight text-white">PIVA</span>
             </a>
 
-            <!-- ================= NAVBAR ================= -->
-<nav class="hidden md:flex items-center gap-2 text-xs tracking-wider uppercase font-semibold text-slate-300">
-    
-    <a href="#about" class="group relative px-4 py-2 hover:text-white transition-colors duration-300">
-        About
-        <span class="absolute bottom-1 left-1/2 -translate-x-1/2 w-0 h-[2px] bg-white group-hover:w-1/2 transition-all duration-300 ease-out shadow-[0_0_8px_rgba(255,255,255,0.8)]"></span>
-    </a>
+            <nav class="hidden md:flex items-center gap-8 text-sm text-slate-300">
+                <a href="#about" class="hover:text-white transition-colors">About</a>
+                <a href="#services" class="hover:text-white transition-colors">Services</a>
+                <a href="#why-piva" class="hover:text-white transition-colors">Why PIVA</a>
+                <a href="#testimonials" class="hover:text-white transition-colors">Testimonials</a>
+            </nav>
 
-    <a href="#services" class="group relative px-4 py-2 hover:text-white transition-colors duration-300">
-        Services
-        <span class="absolute bottom-1 left-1/2 -translate-x-1/2 w-0 h-[2px] bg-white group-hover:w-1/2 transition-all duration-300 ease-out shadow-[0_0_8px_rgba(255,255,255,0.8)]"></span>
-    </a>
-
-    <a href="#why-piva" class="group relative px-4 py-2 hover:text-white transition-colors duration-300">
-        Why PIVA
-        <span class="absolute bottom-1 left-1/2 -translate-x-1/2 w-0 h-[2px] bg-white group-hover:w-1/2 transition-all duration-300 ease-out shadow-[0_0_8px_rgba(255,255,255,0.8)]"></span>
-    </a>
-
-    <a href="#testimonials" class="group relative px-4 py-2 hover:text-white transition-colors duration-300">
-        Testimonials
-        <span class="absolute bottom-1 left-1/2 -translate-x-1/2 w-0 h-[2px] bg-white group-hover:w-1/2 transition-all duration-300 ease-out shadow-[0_0_8px_rgba(255,255,255,0.8)]"></span>
-    </a>
-
-</nav>
-
-            <!-- CTA Button & Mobile Menu Toggle -->
             <div class="flex items-center gap-4">
-    <a href="#contact" class="hidden sm:inline-flex items-center gap-2 px-6 py-2.5 rounded-full text-xs font-bold uppercase tracking-wider text-white bg-gradient-to-r from-[#9c1c5a] to-[#3b1b76]">
-        <span>Book a Free Discovery Call</span>
-        <i class="fa-solid fa-arrow-right text-[10px] text-white"></i>
-    </a>
-</div>
-
-                <button id="mobile-menu-btn" class="md:hidden text-slate-300 hover:text-white p-2" aria-label="Toggle Navigation">
-                    <i class="fa-solid fa-bars-staggered text-xl"></i>
+                <a href="#contact" class="hidden sm:inline-flex items-center gap-2 px-5 py-2.5 rounded-full text-sm font-medium text-white btn-primary">
+                    Book a discovery call
+                </a>
+                <button id="mobile-menu-btn" class="md:hidden text-slate-300 hover:text-white p-2" aria-label="Toggle navigation">
+                    <i class="fa-solid fa-bars text-lg" id="mobile-menu-icon"></i>
                 </button>
             </div>
         </div>
 
-       <!-- Mobile Drawer Menu -->
-<div id="mobile-menu" class="hidden md:hidden glass-nav border-t border-slate-800/80 px-6 py-6 space-y-4">
-    
-    <!-- Updated Links: Changed hover color from cyan to white -->
-    <a href="#about" class="block text-slate-300 hover:text-white transition-colors text-base font-medium mobile-link">About</a>
-    <a href="#services" class="block text-slate-300 hover:text-white transition-colors text-base font-medium mobile-link">Services</a>
-    <a href="#why-piva" class="block text-slate-300 hover:text-white transition-colors text-base font-medium mobile-link">Why PIVA</a>
-    <a href="#testimonials" class="block text-slate-300 hover:text-white transition-colors text-base font-medium mobile-link">Testimonials</a>
-    
-    <!-- Updated Button: Replaced btn-8d with the exact gradient, and rounded-full to match the image -->
-    <a href="#contact" class="block w-full text-center px-6 py-3.5 rounded-full text-xs font-bold uppercase tracking-wider text-white bg-gradient-to-r from-[#be185d] to-[#4c1d95] hover:opacity-90 transition-opacity mobile-link">
-        Book a Free Discovery Call
-    </a>
-    
-</div>
+        <div id="mobile-menu" class="hidden md:hidden border-t border-white/5 px-6 py-6 space-y-4">
+            <a href="#about" class="block text-slate-300 hover:text-white text-base mobile-link">About</a>
+            <a href="#services" class="block text-slate-300 hover:text-white text-base mobile-link">Services</a>
+            <a href="#why-piva" class="block text-slate-300 hover:text-white text-base mobile-link">Why PIVA</a>
+            <a href="#testimonials" class="block text-slate-300 hover:text-white text-base mobile-link">Testimonials</a>
+            <a href="#contact" class="block w-full text-center px-6 py-3 rounded-full text-sm font-medium text-white btn-primary mobile-link">Book a discovery call</a>
+        </div>
     </header>
 
-    <!-- Main Content Canvas Overlay Wrapper -->
     <main class="relative z-10">
 
-        <!-- 1. HERO SECTION -->
-        <section id="hero" class="min-h-screen flex items-center justify-center relative pt-32 pb-20 px-6">
-            <div class="max-w-5xl mx-auto text-center space-y-8">
-                
+        <!-- HERO -->
+        <section id="hero" class="min-h-screen flex items-center justify-start pt-32 pb-20 px-6 lg:px-16">
+            <div class="max-w-2xl space-y-8">
+                <div class="inline-flex items-center gap-2 px-4 py-1.5 rounded-full border border-white/10 bg-white/5 text-slate-300 text-sm">
+                    3D digital experience studio
+                </div>
 
-                <!-- Hero Heading -->
-                <h1 class="font-heading text-4xl sm:text-6xl md:text-7xl lg:text-8xl font-black tracking-tight leading-none">
-                    PIVA <span class="text-slate-600 font-light"></span> <br />
-                    <span class="text-gradient-8d">Marketing</span>
+                <h1 class="font-heading text-4xl sm:text-6xl md:text-7xl font-bold tracking-tight leading-[1.05]">
+                    Your Vision
+                    <span class="text-gradient">Our Strategy.</span>
                 </h1>
 
-                <!-- Subtitle -->
-                <p class="text-base sm:text-xl text-slate-400 max-w-3xl mx-auto font-light leading-relaxed tracking-wide">
-                    We construct hyper-immersive, multidimensional WebGL realities, quantum digital architecture, and real-time spatial interfaces for forward-thinking global brands.
+                <p class="text-lg text-slate-400 max-w-xl leading-relaxed">
+                    PIVA Marketing helps small and growing businesses build a stronger online presence, attract the 
+                    right customers, and turn leads into real sales.
                 </p>
 
-               <!-- Action Buttons -->
-<div class="flex flex-col sm:flex-row items-center justify-center gap-5 pt-6">
-    
-    <!-- Primary CTA Button (Now uses the exact gradient) -->
-    <a href="#services" class="w-full sm:w-auto px-9 py-4 rounded-full text-xs font-bold uppercase tracking-widest text-white bg-gradient-to-r from-[#be185d] to-[#4c1d95] hover:opacity-90 transition-all shadow-xl shadow-[#be185d]/20 hover:scale-105 flex items-center justify-center gap-3">
-        <span>Explore PIVA Services</span>
-        <i class="fa-solid fa-shapes text-sm"></i>
-    </a>
-    
-    <!-- Secondary CTA Button (Now uses the exact gradient) -->
-    <a href="#about" class="w-full sm:w-auto px-9 py-4 rounded-full text-xs font-bold uppercase tracking-widest text-white bg-gradient-to-r from-[#be185d] to-[#4c1d95] hover:opacity-90 transition-all shadow-xl shadow-[#4c1d95]/20 hover:scale-105 flex items-center justify-center gap-3">
-        <span>Why PIVA Marketing</span>
-        <i class="fa-solid fa-compass text-sm"></i>
-    </a>
-
-</div>
-
-                <!-- Interactive Spatial Coordinate HUD Bar
-                <div class="pt-20 grid grid-cols-2 md:grid-cols-4 gap-4 max-w-3xl mx-auto text-left font-mono text-[11px] text-slate-500">
-                    <div class="p-3 rounded-lg glass-panel border-slate-800/50">
-                        <span class="block text-slate-600 uppercase text-[9px]">Dimension Matrix</span>
-                        <span class="text-cyan-400 font-bold">X:8.024 // Y:4.119</span>
-                    </div>
-                    <div class="p-3 rounded-lg glass-panel border-slate-800/50">
-                        <span class="block text-slate-600 uppercase text-[9px]">Quantum Core</span>
-                        <span class="text-purple-400 font-bold">Torus Fractal Knot</span>
-                    </div>
-                    <div class="p-3 rounded-lg glass-panel border-slate-800/50">
-                        <span class="block text-slate-600 uppercase text-[9px]">Frame Frequency</span>
-                        <span class="text-emerald-400 font-bold">120 FPS Realtime</span>
-                    </div>
-                    <div class="p-3 rounded-lg glass-panel border-slate-800/50">
-                        <span class="block text-slate-600 uppercase text-[9px]">Refraction Index</span>
-                        <span class="text-amber-400 font-bold">η = 1.849 Refractive</span>
-                    </div>
-                </div> -->
-
+                <div class="flex flex-col sm:flex-row items-start sm:items-center gap-4 pt-4">
+                    <a href="#services" class="w-full sm:w-auto px-8 py-3.5 rounded-full text-sm font-medium text-white btn-primary text-center">
+                        Start Your Project
+                    </a>
+                    <a href="#about" class="w-full sm:w-auto px-8 py-3.5 rounded-full text-sm font-medium text-white btn-outline text-center">
+                        Explore Our Services
+                    </a>
+                </div>
             </div>
         </section>
 
-        <!-- 2. ABOUT SECTION -->
-        <section id="about" class="py-32 px-6 relative">
-            <div class="max-w-7xl mx-auto">
-                <div class="text-center max-w-3xl mx-auto mb-20 space-y-4 gs-reveal">
-                    <div class="inline-block px-4 py-1.5 rounded-full bg-purple-500/10 border border-purple-500/20 text-purple-400 text-xs font-mono uppercase tracking-widest">
-                        Quantum Spatial Design
-                    </div>
-                    <h2 class="font-heading text-3xl sm:text-5xl font-bold tracking-tight">
-                        Beyond Standard 3D <br />
-                        <span class="text-gradient-8d">The 8D Multidimensional Paradigm</span>
+        <!-- ABOUT -->
+        <section id="about" class="py-28 px-6">
+            <div class="max-w-6xl mx-auto">
+                <div class="max-w-2xl mb-16 gs-reveal">
+                    <p class="text-[color:var(--accent)] text-sm mb-3">ABOUT PIVA</p>
+                    <h2 class="font-heading text-3xl sm:text-4xl font-bold tracking-tight leading-tight mb-5">
+                        Your Growth Partner in the Digital World.
                     </h2>
-                    <p class="text-slate-400 text-base leading-relaxed">
-                        Traditional web interfaces are flat. Standard 3D is static. PIVA’s 8D architecture unifies real-time volumetric rendering, scroll-triggered optical shifts, continuous chromatic light fields, and fluid multi-axis particle dynamics into a single responsive layer.
+                    <p class="text-slate-400 leading-relaxed">
+                        PIVA Marketing was created to help small businesses and growing
+                        brands get the right tools. the right strategy, and the right
+                        support to stand out, get found, and grow with confidence
                     </p>
                 </div>
 
-                <!-- 8D Pillar Cards -->
-                <div class="grid grid-cols-1 md:grid-cols-3 gap-8">
-                    <div class="glass-panel p-8 rounded-3xl space-y-5 gs-reveal">
-                        <div class="w-12 h-12 rounded-2xl bg-cyan-500/10 border border-cyan-500/20 flex items-center justify-center text-cyan-400 text-xl font-bold">
-                            01
+                <div class="grid grid-cols-1 md:grid-cols-3 gap-6">
+                    <div class="glass-panel p-8 rounded-2xl space-y-4 gs-reveal">
+                        <div class="w-11 h-11 rounded-xl bg-[color:var(--accent)]/10 border border-[color:var(--accent)]/25 flex items-center justify-center text-[color:var(--accent)] text-lg">
+                            <i class="fa-solid fa-cube"></i>
                         </div>
-                        <h3 class="font-heading text-2xl font-bold text-white">Hyper-Refractive Geometry</h3>
+                        <h3 class="font-heading text-xl font-semibold text-white">Real-time rendering</h3>
                         <p class="text-slate-400 text-sm leading-relaxed">
-                            Custom Shader Material nodes simulating real-time optical refraction, chromatic dispersion, and volumetric light scattering directly inside browser render threads.
+                            Custom WebGL scenes rendered live in the browser, so every visitor gets an interactive experience rather than a static image or video.
                         </p>
-                        <div class="pt-2 text-xs font-mono text-cyan-400 flex items-center gap-2">
-                            <i class="fa-solid fa-atom"></i> GLSL Shader Pipeline
-                        </div>
                     </div>
 
-                    <div class="glass-panel p-8 rounded-3xl space-y-5 gs-reveal">
-                        <div class="w-12 h-12 rounded-2xl bg-purple-500/10 border border-purple-500/20 flex items-center justify-center text-purple-400 text-xl font-bold">
-                            02
+                    <div class="glass-panel p-8 rounded-2xl space-y-4 gs-reveal">
+                        <div class="w-11 h-11 rounded-xl bg-[color:var(--accent-2)]/10 border border-[color:var(--accent-2)]/25 flex items-center justify-center text-[color:var(--accent-2)] text-lg">
+                            <i class="fa-solid fa-arrows-to-dot"></i>
                         </div>
-                        <h3 class="font-heading text-2xl font-bold text-white">Multi-Axis Orbital Kinematics</h3>
+                        <h3 class="font-heading text-xl font-semibold text-white">Motion that responds</h3>
                         <p class="text-slate-400 text-sm leading-relaxed">
-                            Dual-torus orbital networks reacting to mouse displacement vectors and page velocity, creating organic, living geometric movements as users scroll.
+                            Geometry reacts to scroll position and cursor movement, giving the page a sense of depth static design can't reach.
                         </p>
-                        <div class="pt-2 text-xs font-mono text-purple-400 flex items-center gap-2">
-                            <i class="fa-solid fa-orbit"></i> Gyroid Mesh Dynamics
-                        </div>
                     </div>
 
-                    <div class="glass-panel p-8 rounded-3xl space-y-5 gs-reveal">
-                        <div class="w-12 h-12 rounded-2xl bg-amber-500/10 border border-amber-500/20 flex items-center justify-center text-amber-400 text-xl font-bold">
-                            03
+                    <div class="glass-panel p-8 rounded-2xl space-y-4 gs-reveal">
+                        <div class="w-11 h-11 rounded-xl bg-[color:var(--accent)]/10 border border-[color:var(--accent)]/25 flex items-center justify-center text-[color:var(--accent)] text-lg">
+                            <i class="fa-solid fa-lightbulb"></i>
                         </div>
-                        <h3 class="font-heading text-2xl font-bold text-white">Quantum Light Fields</h3>
+                        <h3 class="font-heading text-xl font-semibold text-white">Considered lighting</h3>
                         <p class="text-slate-400 text-sm leading-relaxed">
-                            Volumetric point-light emitters changing color frequencies dynamically across scroll states to highlight key narrative and product milestones.
+                            Light and color shift gently through the page, guiding attention to key moments without overwhelming the content.
                         </p>
-                        <div class="pt-2 text-xs font-mono text-amber-400 flex items-center gap-2">
-                            <i class="fa-solid fa-bolt"></i> Chromatic Light Modulation
-                        </div>
                     </div>
                 </div>
             </div>
         </section>
 
-        <!-- 3. SERVICES SECTION -->
-        <section id="services" class="py-32 px-6 relative">
-            <div class="max-w-7xl mx-auto">
-                <div class="flex flex-col md:flex-row md:items-end justify-between mb-20 gap-8 gs-reveal">
-                    <div>
-                        <span class="text-cyan-400 font-mono text-xs uppercase tracking-widest">Capabilities</span>
-                        <h2 class="font-heading text-3xl sm:text-5xl font-bold mt-2">
-                            Multidimensional <span class="text-gradient-8d">Services</span>
-                        </h2>
-                    </div>
+        <!-- SERVICES -->
+        <section id="services" class="py-28 px-6">
+            <div class="max-w-6xl mx-auto">
+                <div class="flex flex-col md:flex-row md:items-end justify-between mb-16 gap-6 gs-reveal">
+                    <h2 class="font-heading text-3xl sm:text-4xl font-bold tracking-tight">Services</h2>
                     <p class="text-slate-400 max-w-md text-sm leading-relaxed">
-                        Precision engineering designed for brands that require world-class digital distinction, sub-second execution speeds, and unforgettable visual impact.
+                        Engineering and design for brands that want a site people actually stay on.
                     </p>
                 </div>
 
-                <!-- Services Grid -->
-                <div class="grid grid-cols-1 md:grid-cols-2 gap-8">
-                    <!-- Service 1 -->
-                    <div class="glass-panel p-8 sm:p-10 rounded-3xl border border-slate-800/80 hover:border-cyan-500/40 group gs-reveal">
-                        <div class="flex items-center justify-between mb-8">
-                            <div class="w-14 h-14 rounded-2xl bg-cyan-500/10 border border-cyan-500/30 flex items-center justify-center text-cyan-400 text-2xl group-hover:scale-110 transition-transform">
-                                <i class="fa-solid fa-cube"></i>
-                            </div>
-                            <span class="font-mono text-xs text-slate-500 border border-slate-800 px-3 py-1 rounded-full">01 / 8D WEBGL</span>
+                <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
+                    <div class="glass-panel p-8 sm:p-9 rounded-2xl gs-reveal">
+                        <div class="w-12 h-12 rounded-xl bg-[color:var(--accent)]/10 border border-[color:var(--accent)]/25 flex items-center justify-center text-[color:var(--accent)] text-xl mb-6">
+                            <i class="fa-solid fa-cube"></i>
                         </div>
-                        <h3 class="font-heading text-2xl sm:text-3xl font-bold mb-4 text-white group-hover:text-cyan-300 transition-colors">
-                            8D Real-Time WebGL Environments
-                        </h3>
-                        <p class="text-slate-400 text-sm leading-relaxed mb-6">
-                            Interactive 3D landing pages, product configurators, and spatial brand web worlds built with multi-layered Three.js, GPU acceleration, and procedural shaders.
+                        <h3 class="font-heading text-xl font-semibold text-white mb-3">3D web experiences</h3>
+                        <p class="text-slate-400 text-sm leading-relaxed mb-5">
+                            Interactive landing pages, product configurators, and brand worlds built with Three.js, GPU-accelerated rendering, and custom shaders.
                         </p>
-                        <div class="flex flex-wrap gap-2 text-[11px] font-mono text-slate-300">
-                            <span class="px-3 py-1 rounded-full bg-slate-900 border border-slate-800">Custom GLSL Shaders</span>
-                            <span class="px-3 py-1 rounded-full bg-slate-900 border border-slate-800">Multi-Toroid Geometry</span>
-                            <span class="px-3 py-1 rounded-full bg-slate-900 border border-slate-800">Refractive Glass Physics</span>
+                        <div class="flex flex-wrap gap-2 text-xs text-slate-300">
+                            <span class="px-3 py-1 rounded-full bg-white/5 border border-white/10">Custom shaders</span>
+                            <span class="px-3 py-1 rounded-full bg-white/5 border border-white/10">3D geometry</span>
                         </div>
                     </div>
 
-                    <!-- Service 2 -->
-                    <div class="glass-panel p-8 sm:p-10 rounded-3xl border border-slate-800/80 hover:border-purple-500/40 group gs-reveal">
-                        <div class="flex items-center justify-between mb-8">
-                            <div class="w-14 h-14 rounded-2xl bg-purple-500/10 border border-purple-500/30 flex items-center justify-center text-purple-400 text-2xl group-hover:scale-110 transition-transform">
-                                <i class="fa-solid fa-network-wired"></i>
-                            </div>
-                            <span class="font-mono text-xs text-slate-500 border border-slate-800 px-3 py-1 rounded-full">02 / SPATIAL ARCHITECTURE</span>
+                    <div class="glass-panel p-8 sm:p-9 rounded-2xl gs-reveal">
+                        <div class="w-12 h-12 rounded-xl bg-[color:var(--accent-2)]/10 border border-[color:var(--accent-2)]/25 flex items-center justify-center text-[color:var(--accent-2)] text-xl mb-6">
+                            <i class="fa-solid fa-network-wired"></i>
                         </div>
-                        <h3 class="font-heading text-2xl sm:text-3xl font-bold mb-4 text-white group-hover:text-purple-300 transition-colors">
-                            AI-Driven Quantum Frontends
-                        </h3>
-                        <p class="text-slate-400 text-sm leading-relaxed mb-6">
-                            Integrating predictive artificial intelligence models, real-time data visualizers, and reactive UI component architectures into smooth 60+ FPS web applications.
+                        <h3 class="font-heading text-xl font-semibold text-white mb-3">AI-enhanced interfaces</h3>
+                        <p class="text-slate-400 text-sm leading-relaxed mb-5">
+                            Predictive features, live data visualization, and adaptive UI woven into fast, modern web applications.
                         </p>
-                        <div class="flex flex-wrap gap-2 text-[11px] font-mono text-slate-300">
-                            <span class="px-3 py-1 rounded-full bg-slate-900 border border-slate-800">Generative AI UI</span>
-                            <span class="px-3 py-1 rounded-full bg-slate-900 border border-slate-800">Realtime Data Streaming</span>
-                            <span class="px-3 py-1 rounded-full bg-slate-900 border border-slate-800">Micro-Interactions</span>
+                        <div class="flex flex-wrap gap-2 text-xs text-slate-300">
+                            <span class="px-3 py-1 rounded-full bg-white/5 border border-white/10">Live data</span>
+                            <span class="px-3 py-1 rounded-full bg-white/5 border border-white/10">Micro-interactions</span>
                         </div>
                     </div>
 
-                    <!-- Service 3 -->
-                    <div class="glass-panel p-8 sm:p-10 rounded-3xl border border-slate-800/80 hover:border-emerald-500/40 group gs-reveal">
-                        <div class="flex items-center justify-between mb-8">
-                            <div class="w-14 h-14 rounded-2xl bg-emerald-500/10 border border-emerald-500/30 flex items-center justify-center text-emerald-400 text-2xl group-hover:scale-110 transition-transform">
-                                <i class="fa-solid fa-wand-magic-sparkles"></i>
-                            </div>
-                            <span class="font-mono text-xs text-slate-500 border border-slate-800 px-3 py-1 rounded-full">03 / BRAND TRANSFORMATION</span>
+                    <div class="glass-panel p-8 sm:p-9 rounded-2xl gs-reveal">
+                        <div class="w-12 h-12 rounded-xl bg-[color:var(--accent)]/10 border border-[color:var(--accent)]/25 flex items-center justify-center text-[color:var(--accent)] text-xl mb-6">
+                            <i class="fa-solid fa-wand-magic-sparkles"></i>
                         </div>
-                        <h3 class="font-heading text-2xl sm:text-3xl font-bold mb-4 text-white group-hover:text-emerald-300 transition-colors">
-                            Multidimensional Identity & Motion
-                        </h3>
-                        <p class="text-slate-400 text-sm leading-relaxed mb-6">
-                            Reimagining enterprise brand identities through dark obsidian themes, holographic color palettes, kinetic typography, and motion design systems.
+                        <h3 class="font-heading text-xl font-semibold text-white mb-3">Brand &amp; motion design</h3>
+                        <p class="text-slate-400 text-sm leading-relaxed mb-5">
+                            Distinctive visual identities — color systems, typography, and motion language built for premium digital brands.
                         </p>
-                        <div class="flex flex-wrap gap-2 text-[11px] font-mono text-slate-300">
-                            <span class="px-3 py-1 rounded-full bg-slate-900 border border-slate-800">Dark Obsidian Aesthetic</span>
-                            <span class="px-3 py-1 rounded-full bg-slate-900 border border-slate-800">Kinetic Motion Design</span>
-                            <span class="px-3 py-1 rounded-full bg-slate-900 border border-slate-800">Design System Tokens</span>
+                        <div class="flex flex-wrap gap-2 text-xs text-slate-300">
+                            <span class="px-3 py-1 rounded-full bg-white/5 border border-white/10">Visual identity</span>
+                            <span class="px-3 py-1 rounded-full bg-white/5 border border-white/10">Design systems</span>
                         </div>
                     </div>
 
-                    <!-- Service 4 -->
-                    <div class="glass-panel p-8 sm:p-10 rounded-3xl border border-slate-800/80 hover:border-amber-500/40 group gs-reveal">
-                        <div class="flex items-center justify-between mb-8">
-                            <div class="w-14 h-14 rounded-2xl bg-amber-500/10 border border-amber-500/30 flex items-center justify-center text-amber-400 text-2xl group-hover:scale-110 transition-transform">
-                                <i class="fa-solid fa-microchip"></i>
-                            </div>
-                            <span class="font-mono text-xs text-slate-500 border border-slate-800 px-3 py-1 rounded-full">04 / FULL-STACK PLATFORMS</span>
+                    <div class="glass-panel p-8 sm:p-9 rounded-2xl gs-reveal">
+                        <div class="w-12 h-12 rounded-xl bg-[color:var(--accent-2)]/10 border border-[color:var(--accent-2)]/25 flex items-center justify-center text-[color:var(--accent-2)] text-xl mb-6">
+                            <i class="fa-solid fa-microchip"></i>
                         </div>
-                        <h3 class="font-heading text-2xl sm:text-3xl font-bold mb-4 text-white group-hover:text-amber-300 transition-colors">
-                            Next-Gen Web Architecture
-                        </h3>
-                        <p class="text-slate-400 text-sm leading-relaxed mb-6">
-                            Scalable web applications engineered with modular codebases, WebAssembly modules, and optimized render cycles for maximum global performance.
+                        <h3 class="font-heading text-xl font-semibold text-white mb-3">Scalable platforms</h3>
+                        <p class="text-slate-400 text-sm leading-relaxed mb-5">
+                            Production web applications architected for performance, security, and room to grow.
                         </p>
-                        <div class="flex flex-wrap gap-2 text-[11px] font-mono text-slate-300">
-                            <span class="px-3 py-1 rounded-full bg-slate-900 border border-slate-800">Ultra-Low Latency</span>
-                            <span class="px-3 py-1 rounded-full bg-slate-900 border border-slate-800">Modular Web Frameworks</span>
-                            <span class="px-3 py-1 rounded-full bg-slate-900 border border-slate-800">High-Security Core</span>
+                        <div class="flex flex-wrap gap-2 text-xs text-slate-300">
+                            <span class="px-3 py-1 rounded-full bg-white/5 border border-white/10">Performance</span>
+                            <span class="px-3 py-1 rounded-full bg-white/5 border border-white/10">Security</span>
                         </div>
                     </div>
                 </div>
             </div>
         </section>
 
-        <!-- 4. WHY PIVA SECTION -->
-        <section id="why-piva" class="py-32 px-6 relative">
-            <div class="max-w-7xl mx-auto">
+        <!-- WHY PIVA -->
+        <section id="why-piva" class="py-28 px-6">
+            <div class="max-w-6xl mx-auto">
                 <div class="grid grid-cols-1 lg:grid-cols-12 gap-12 items-center">
-                    
-                    <!-- Left Content Info -->
-                    <div class="lg:col-span-7 space-y-8 gs-reveal">
-                        <div class="inline-block px-4 py-1.5 rounded-full bg-cyan-500/10 border border-cyan-500/20 text-cyan-400 text-xs font-mono uppercase tracking-widest">
-                            The PIVA Edge
-                        </div>
-                        <h2 class="font-heading text-3xl sm:text-5xl font-bold leading-tight">
-                            Why Global Leaders Trust <br />
-                            <span class="text-gradient-8d">The PIVA Matrix</span>
+                    <div class="lg:col-span-7 space-y-7 gs-reveal">
+                        <h2 class="font-heading text-3xl sm:text-4xl font-bold tracking-tight leading-tight">
+                            Why teams choose PIVA
                         </h2>
-                        <p class="text-slate-400 text-base leading-relaxed">
-                            In an era of cookie-cutter templates, PIVA constructs bespoke digital dimensions. We combine mathematical precision, GPU shader programming, and modern user experience principles to deliver undeniable market leadership.
+                        <p class="text-slate-400 leading-relaxed">
+                            We build bespoke 3D systems rather than templates — combining shader programming, motion design, and modern engineering practice to ship something that actually holds up in production.
                         </p>
 
-                        <!-- Highlights List -->
-                        <div class="space-y-4 pt-2">
-                            <div class="flex items-start gap-4 p-5 rounded-2xl glass-panel border-slate-800/60">
-                                <div class="w-10 h-10 rounded-xl bg-cyan-400/20 text-cyan-400 flex items-center justify-center shrink-0 font-bold">
+                        <div class="space-y-3 pt-2">
+                            <div class="flex items-start gap-4 p-5 rounded-xl glass-panel">
+                                <div class="w-10 h-10 rounded-lg bg-[color:var(--accent)]/15 text-[color:var(--accent)] flex items-center justify-center shrink-0">
                                     <i class="fa-solid fa-gauge-high"></i>
                                 </div>
                                 <div>
-                                    <h4 class="font-bold text-white mb-1 text-base">Uncompromised Frame Rates</h4>
-                                    <p class="text-slate-400 text-sm">GPU-optimized shaders maintaining 60–120 FPS across desktop, tablet, and mobile browsers.</p>
+                                    <h4 class="font-semibold text-white mb-1 text-base">Consistent frame rates</h4>
+                                    <p class="text-slate-400 text-sm">GPU-optimized rendering that holds 60fps+ across desktop and mobile.</p>
                                 </div>
                             </div>
 
-                            <div class="flex items-start gap-4 p-5 rounded-2xl glass-panel border-slate-800/60">
-                                <div class="w-10 h-10 rounded-xl bg-purple-400/20 text-purple-400 flex items-center justify-center shrink-0 font-bold">
+                            <div class="flex items-start gap-4 p-5 rounded-xl glass-panel">
+                                <div class="w-10 h-10 rounded-lg bg-[color:var(--accent-2)]/15 text-[color:var(--accent-2)] flex items-center justify-center shrink-0">
                                     <i class="fa-solid fa-fingerprint"></i>
                                 </div>
                                 <div>
-                                    <h4 class="font-bold text-white mb-1 text-base">Proprietary 8D Shader Nodes</h4>
-                                    <p class="text-slate-400 text-sm">Unique geometric structures and refractive optical formulas written specifically for your brand identity.</p>
+                                    <h4 class="font-semibold text-white mb-1 text-base">Custom 3D systems</h4>
+                                    <p class="text-slate-400 text-sm">Original geometry and shader work built specifically for your brand — never a template.</p>
                                 </div>
                             </div>
 
-                            <div class="flex items-start gap-4 p-5 rounded-2xl glass-panel border-slate-800/60">
-                                <div class="w-10 h-10 rounded-xl bg-emerald-400/20 text-emerald-400 flex items-center justify-center shrink-0 font-bold">
-                                    <i class="fa-solid fa-shield-cat"></i>
+                            <div class="flex items-start gap-4 p-5 rounded-xl glass-panel">
+                                <div class="w-10 h-10 rounded-lg bg-[color:var(--accent)]/15 text-[color:var(--accent)] flex items-center justify-center shrink-0">
+                                    <i class="fa-solid fa-shield-halved"></i>
                                 </div>
                                 <div>
-                                    <h4 class="font-bold text-white mb-1 text-base">Enterprise Code Standards</h4>
-                                    <p class="text-slate-400 text-sm">Clean, modular, thoroughly documented codebases engineered to scale seamlessly as your platform grows.</p>
+                                    <h4 class="font-semibold text-white mb-1 text-base">Production-ready code</h4>
+                                    <p class="text-slate-400 text-sm">Clean, documented codebases built to scale with your engineering team.</p>
                                 </div>
                             </div>
                         </div>
                     </div>
 
-                    <!-- Right Stats Counter Grid -->
-                    <div class="lg:col-span-5 grid grid-cols-2 gap-6 gs-reveal">
-                        <div class="glass-panel p-8 rounded-3xl text-center space-y-3 border-cyan-500/20">
-                            <div class="font-heading text-4xl sm:text-5xl font-extrabold text-cyan-400" id="stat-1">99.8%</div>
-                            <div class="text-slate-400 text-xs font-mono uppercase tracking-wider">Client Retention</div>
+                    <div class="lg:col-span-5 grid grid-cols-2 gap-5 gs-reveal">
+                        <div class="glass-panel p-7 rounded-2xl text-center space-y-2">
+                            <div class="font-heading text-4xl font-bold text-[color:var(--accent)]">99.8%</div>
+                            <div class="text-slate-400 text-xs">Client retention</div>
                         </div>
-
-                        <div class="glass-panel p-8 rounded-3xl text-center space-y-3 border-purple-500/20">
-                            <div class="font-heading text-4xl sm:text-5xl font-extrabold text-purple-400" id="stat-2">150+</div>
-                            <div class="text-slate-400 text-xs font-mono uppercase tracking-wider">Spatial Deployments</div>
+                        <div class="glass-panel p-7 rounded-2xl text-center space-y-2">
+                            <div class="font-heading text-4xl font-bold text-[color:var(--accent-2)]">150+</div>
+                            <div class="text-slate-400 text-xs">Projects shipped</div>
                         </div>
-
-                        <div class="glass-panel p-8 rounded-3xl text-center space-y-3 border-emerald-500/20">
-                            <div class="font-heading text-4xl sm:text-5xl font-extrabold text-emerald-400" id="stat-3">120 FPS</div>
-                            <div class="text-slate-400 text-xs font-mono uppercase tracking-wider">Smooth WebGL</div>
+                        <div class="glass-panel p-7 rounded-2xl text-center space-y-2">
+                            <div class="font-heading text-4xl font-bold text-[color:var(--accent-2)]">120fps</div>
+                            <div class="text-slate-400 text-xs">Peak frame rate</div>
                         </div>
-
-                        <div class="glass-panel p-8 rounded-3xl text-center space-y-3 border-amber-500/20">
-                            <div class="font-heading text-4xl sm:text-5xl font-extrabold text-amber-400" id="stat-4">18+</div>
-                            <div class="text-slate-400 text-xs font-mono uppercase tracking-wider">Global Design Awards</div>
+                        <div class="glass-panel p-7 rounded-2xl text-center space-y-2">
+                            <div class="font-heading text-4xl font-bold text-[color:var(--accent)]">18+</div>
+                            <div class="text-slate-400 text-xs">Design awards</div>
                         </div>
                     </div>
-
                 </div>
             </div>
         </section>
 
-        <!-- 5. TESTIMONIALS SECTION -->
-        <section id="testimonials" class="py-32 px-6 relative">
-            <div class="max-w-7xl mx-auto">
-                <div class="text-center max-w-3xl mx-auto mb-20 space-y-4 gs-reveal">
-                    <span class="text-purple-400 font-mono text-xs uppercase tracking-widest">Endorsements</span>
-                    <h2 class="font-heading text-3xl sm:text-5xl font-bold">
-                        Validated by <span class="text-gradient-8d">Industry Pioneers</span>
-                    </h2>
-                </div>
+        <!-- TESTIMONIALS -->
+        <section id="testimonials" class="py-28 px-6">
+            <div class="max-w-6xl mx-auto">
+                <h2 class="font-heading text-3xl sm:text-4xl font-bold tracking-tight text-center mb-16 gs-reveal">
+                    Trusted by teams that ship
+                </h2>
 
-                <!-- Testimonial Cards -->
-                <div class="grid grid-cols-1 md:grid-cols-3 gap-8">
-                    <div class="glass-panel p-8 rounded-3xl space-y-6 flex flex-col justify-between border-slate-800/80 gs-reveal">
-                        <div class="space-y-4">
-                            <div class="flex text-amber-400 gap-1 text-xs">
-                                <i class="fa-solid fa-star"></i><i class="fa-solid fa-star"></i><i class="fa-solid fa-star"></i><i class="fa-solid fa-star"></i><i class="fa-solid fa-star"></i>
-                            </div>
-                            <p class="text-slate-300 text-sm leading-relaxed italic">
-                                "PIVA's 8D spatial execution completely revolutionized our brand launch. The scroll-triggered geometric transformations kept users on our site 3x longer than our previous platform."
-                            </p>
-                        </div>
-                        <div class="flex items-center gap-4 pt-4 border-t border-slate-800/60">
-                            <div class="w-11 h-11 rounded-full bg-gradient-to-tr from-cyan-400 to-purple-600 flex items-center justify-center font-bold text-slate-950 font-heading">
-                                EV
-                            </div>
+                <div class="grid grid-cols-1 md:grid-cols-3 gap-6">
+                    <div class="glass-panel p-8 rounded-2xl space-y-6 flex flex-col justify-between gs-reveal">
+                        <p class="text-slate-300 text-sm leading-relaxed">
+                            PIVA's 3D work completely changed our brand launch. The scroll-triggered animation kept visitors on the site three times longer than our previous build.
+                        </p>
+                        <div class="flex items-center gap-3 pt-4 border-t border-white/10">
+                            <div class="w-10 h-10 rounded-full bg-gradient-to-tr from-[color:var(--accent)] to-[color:var(--accent-2)] flex items-center justify-center font-semibold text-slate-950 text-sm">EV</div>
                             <div>
-                                <h4 class="font-bold text-white text-sm">Dr. Elena Vance</h4>
-                                <p class="text-slate-500 text-xs font-mono">CTO, Quantum Spatial Labs</p>
+                                <h4 class="font-semibold text-white text-sm">Elena Vance</h4>
+                                <p class="text-slate-500 text-xs">CTO, Vale Labs</p>
                             </div>
                         </div>
                     </div>
 
-                    <div class="glass-panel p-8 rounded-3xl space-y-6 flex flex-col justify-between border-slate-800/80 gs-reveal">
-                        <div class="space-y-4">
-                            <div class="flex text-amber-400 gap-1 text-xs">
-                                <i class="fa-solid fa-star"></i><i class="fa-solid fa-star"></i><i class="fa-solid fa-star"></i><i class="fa-solid fa-star"></i><i class="fa-solid fa-star"></i>
-                            </div>
-                            <p class="text-slate-300 text-sm leading-relaxed italic">
-                                "The level of visual sophistication and performance optimization is unmatched. PIVA delivered a true 8D multidimensional matrix that blew our board away."
-                            </p>
-                        </div>
-                        <div class="flex items-center gap-4 pt-4 border-t border-slate-800/60">
-                            <div class="w-11 h-11 rounded-full bg-gradient-to-tr from-purple-500 to-emerald-400 flex items-center justify-center font-bold text-slate-950 font-heading">
-                                MK
-                            </div>
+                    <div class="glass-panel p-8 rounded-2xl space-y-6 flex flex-col justify-between gs-reveal">
+                        <p class="text-slate-300 text-sm leading-relaxed">
+                            The level of visual polish and performance work is hard to find elsewhere. They delivered something our whole board still talks about.
+                        </p>
+                        <div class="flex items-center gap-3 pt-4 border-t border-white/10">
+                            <div class="w-10 h-10 rounded-full bg-gradient-to-tr from-[color:var(--accent-2)] to-[color:var(--accent)] flex items-center justify-center font-semibold text-slate-950 text-sm">MK</div>
                             <div>
-                                <h4 class="font-bold text-white text-sm">Marcus Kincaid</h4>
-                                <p class="text-slate-500 text-xs font-mono">Head of Product, Aether AI</p>
+                                <h4 class="font-semibold text-white text-sm">Marcus Kincaid</h4>
+                                <p class="text-slate-500 text-xs">Head of Product, Aether AI</p>
                             </div>
                         </div>
                     </div>
 
-                    <div class="glass-panel p-8 rounded-3xl space-y-6 flex flex-col justify-between border-slate-800/80 gs-reveal">
-                        <div class="space-y-4">
-                            <div class="flex text-amber-400 gap-1 text-xs">
-                                <i class="fa-solid fa-star"></i><i class="fa-solid fa-star"></i><i class="fa-solid fa-star"></i><i class="fa-solid fa-star"></i><i class="fa-solid fa-star"></i>
-                            </div>
-                            <p class="text-slate-300 text-sm leading-relaxed italic">
-                                "Flawless engineering. They balanced complex multi-layered WebGL scenes with sub-second page load speeds across desktop and mobile devices."
-                            </p>
-                        </div>
-                        <div class="flex items-center gap-4 pt-4 border-t border-slate-800/60">
-                            <div class="w-11 h-11 rounded-full bg-gradient-to-tr from-emerald-400 to-amber-400 flex items-center justify-center font-bold text-slate-950 font-heading">
-                                SL
-                            </div>
+                    <div class="glass-panel p-8 rounded-2xl space-y-6 flex flex-col justify-between gs-reveal">
+                        <p class="text-slate-300 text-sm leading-relaxed">
+                            Flawless engineering — complex 3D scenes with sub-second load times across every device we tested.
+                        </p>
+                        <div class="flex items-center gap-3 pt-4 border-t border-white/10">
+                            <div class="w-10 h-10 rounded-full bg-gradient-to-tr from-[color:var(--accent)] to-[color:var(--accent-2)] flex items-center justify-center font-semibold text-slate-950 text-sm">SL</div>
                             <div>
-                                <h4 class="font-bold text-white text-sm">Sophia Lin</h4>
-                                <p class="text-slate-500 text-xs font-mono">VP Design, Apex Global</p>
+                                <h4 class="font-semibold text-white text-sm">Sophia Lin</h4>
+                                <p class="text-slate-500 text-xs">VP Design, Apex Global</p>
                             </div>
                         </div>
                     </div>
@@ -592,386 +410,211 @@
             </div>
         </section>
 
-        <!-- 6. CONTACT SECTION & FOOTER -->
-        <section id="contact" class="py-32 px-6 relative">
-            <div class="max-w-4xl mx-auto">
-                <div class="glass-panel p-8 sm:p-14 rounded-3xl relative overflow-hidden gs-reveal">
-                    <!-- Glow lights -->
-                    <div class="absolute -top-32 -right-32 w-80 h-80 bg-cyan-500/10 rounded-full blur-3xl pointer-events-none"></div>
-                    <div class="absolute -bottom-32 -left-32 w-80 h-80 bg-purple-500/10 rounded-full blur-3xl pointer-events-none"></div>
-
-                    <div class="text-center space-y-4 mb-12">
-                        <span class="text-cyan-400 font-mono text-xs uppercase tracking-widest">Initialization</span>
-                        <h2 class="font-heading text-3xl sm:text-5xl font-bold">
-                            Initiate <span class="text-gradient-8d">8D Transmission</span>
+        <!-- CONTACT -->
+        <section id="contact" class="py-28 px-6">
+            <div class="max-w-3xl mx-auto">
+                <div class="glass-panel p-8 sm:p-12 rounded-3xl relative overflow-hidden gs-reveal">
+                    <div class="text-center space-y-3 mb-10">
+                        <h2 class="font-heading text-3xl sm:text-4xl font-bold tracking-tight">
+                            Let's build something worth remembering
                         </h2>
                         <p class="text-slate-400 text-sm max-w-lg mx-auto">
-                            Ready to construct your multidimensional digital realm? Send us your brief and our spatial engineers will respond within 24 hours.
+                            Tell us about your project and our team will respond within 24 hours.
                         </p>
                     </div>
 
-                    <!-- Form -->
-                    <form id="piva-contact-form" class="space-y-6" onsubmit="event.preventDefault(); showFormSuccess();">
-                        <div class="grid grid-cols-1 sm:grid-cols-2 gap-6">
+                    <form id="piva-contact-form" class="space-y-5" onsubmit="event.preventDefault(); showFormSuccess();">
+                        <div class="grid grid-cols-1 sm:grid-cols-2 gap-5">
                             <div>
-                                <label class="block text-xs font-mono uppercase tracking-wider text-slate-400 mb-2">Name / Identity</label>
-                                <input type="text" required placeholder="Alex Mercer" class="w-full bg-slate-950/80 border border-slate-800 rounded-xl px-4 py-3.5 text-slate-100 placeholder-slate-600 focus:outline-none focus:border-cyan-400 transition-colors text-sm">
+                                <label class="block text-sm text-slate-400 mb-1.5">Name</label>
+                                <input type="text" required placeholder="Alex Mercer" class="w-full bg-black/30 border border-white/10 rounded-xl px-4 py-3 text-slate-100 placeholder-slate-600 focus:outline-none text-sm">
                             </div>
                             <div>
-                                <label class="block text-xs font-mono uppercase tracking-wider text-slate-400 mb-2">Corporate Email</label>
-                                <input type="email" required placeholder="alex@enterprise.com" class="w-full bg-slate-950/80 border border-slate-800 rounded-xl px-4 py-3.5 text-slate-100 placeholder-slate-600 focus:outline-none focus:border-cyan-400 transition-colors text-sm">
+                                <label class="block text-sm text-slate-400 mb-1.5">Email</label>
+                                <input type="email" required placeholder="alex@company.com" class="w-full bg-black/30 border border-white/10 rounded-xl px-4 py-3 text-slate-100 placeholder-slate-600 focus:outline-none text-sm">
                             </div>
                         </div>
 
                         <div>
-                            <label class="block text-xs font-mono uppercase tracking-wider text-slate-400 mb-2">Matrix Target Scope</label>
-                            <select class="w-full bg-slate-950/80 border border-slate-800 rounded-xl px-4 py-3.5 text-slate-100 focus:outline-none focus:border-cyan-400 transition-colors text-sm">
-                                <option>8D Real-Time WebGL World</option>
-                                <option>AI-Driven Quantum Frontend</option>
-                                <option>Multidimensional Brand Identity</option>
-                                <option>Next-Gen Full-Stack Platform</option>
+                            <label class="block text-sm text-slate-400 mb-1.5">Project type</label>
+                            <select class="w-full bg-black/30 border border-white/10 rounded-xl px-4 py-3 text-slate-100 focus:outline-none text-sm">
+                                <option>3D web experience</option>
+                                <option>AI-enhanced interface</option>
+                                <option>Brand &amp; motion design</option>
+                                <option>Full-stack platform</option>
                             </select>
                         </div>
 
                         <div>
-                            <label class="block text-xs font-mono uppercase tracking-wider text-slate-400 mb-2">Transmission Message</label>
-                            <textarea rows="4" required placeholder="Describe your visionary project scope..." class="w-full bg-slate-950/80 border border-slate-800 rounded-xl px-4 py-3.5 text-slate-100 placeholder-slate-600 focus:outline-none focus:border-cyan-400 transition-colors text-sm"></textarea>
+                            <label class="block text-sm text-slate-400 mb-1.5">Project details</label>
+                            <textarea rows="4" required placeholder="Tell us what you're building..." class="w-full bg-black/30 border border-white/10 rounded-xl px-4 py-3 text-slate-100 placeholder-slate-600 focus:outline-none text-sm"></textarea>
                         </div>
 
-                        <button type="submit" class="w-full py-4 rounded-xl text-xs font-bold uppercase tracking-widest text-white btn-8d flex items-center justify-center gap-3">
-                            <span>Transmit Query to Matrix</span>
-                            <i class="fa-solid fa-paper-plane text-cyan-400"></i>
+                        <button type="submit" class="w-full py-3.5 rounded-xl text-sm font-medium text-white btn-primary">
+                            Send message
                         </button>
                     </form>
 
-                    <!-- Success State -->
-                    <div id="form-success" class="hidden text-center py-12 space-y-4">
-                        <div class="w-16 h-16 rounded-full bg-cyan-400/20 text-cyan-400 flex items-center justify-center text-3xl mx-auto border border-cyan-400/40">
+                    <div id="form-success" class="hidden text-center py-10 space-y-3">
+                        <div class="w-14 h-14 rounded-full bg-[color:var(--accent)]/15 text-[color:var(--accent)] flex items-center justify-center text-2xl mx-auto">
                             <i class="fa-solid fa-check"></i>
                         </div>
-                        <h3 class="text-2xl font-bold font-heading text-white">Transmission Successful</h3>
-                        <p class="text-slate-400 text-sm">Your quantum query has been logged into the PIVA matrix. Our engineers will establish contact shortly.</p>
+                        <h3 class="text-xl font-semibold text-white">Message sent</h3>
+                        <p class="text-slate-400 text-sm">Thanks for reaching out — we'll be in touch within 24 hours.</p>
                     </div>
                 </div>
             </div>
         </section>
 
-        <!-- FOOTER -->
-        <footer class="border-t border-slate-900 py-12 px-6 glass-nav">
-            <div class="max-w-7xl mx-auto flex flex-col md:flex-row items-center justify-between gap-6">
-                <!-- Logo -->
-                <div class="flex items-center gap-3">
-                    <div class="w-8 h-8 rounded-lg bg-slate-900 border border-cyan-500/40 flex items-center justify-center text-white font-bold text-base font-heading">
-                        P
-                    </div>
-                    <span class="font-heading font-bold text-xl tracking-wider text-white">PIVA<span class="text-cyan-400">.8D</span></span>
+        <footer class="border-t border-white/5 py-10 px-6 glass-nav">
+            <div class="max-w-6xl mx-auto flex flex-col md:flex-row items-center justify-between gap-6">
+                <div class="flex items-center gap-2.5">
+                    <div class="w-7 h-7 rounded-lg bg-white/5 border border-white/10 flex items-center justify-center text-white font-heading font-bold text-xs">P</div>
+                    <span class="font-heading font-semibold text-white">PIVA</span>
                 </div>
 
-                <!-- Nav Links -->
-                <div class="flex flex-wrap justify-center gap-8 text-xs font-mono uppercase tracking-wider text-slate-400">
-                    <a href="#about" class="hover:text-cyan-400 transition-colors">About</a>
-                    <a href="#services" class="hover:text-cyan-400 transition-colors">Services</a>
-                    <a href="#why-piva" class="hover:text-cyan-400 transition-colors">Why PIVA</a>
-                    <a href="#testimonials" class="hover:text-cyan-400 transition-colors">Testimonials</a>
-                    <a href="#contact" class="hover:text-cyan-400 transition-colors">Contact</a>
+                <div class="flex flex-wrap justify-center gap-6 text-sm text-slate-400">
+                    <a href="#about" class="hover:text-white transition-colors">About</a>
+                    <a href="#services" class="hover:text-white transition-colors">Services</a>
+                    <a href="#why-piva" class="hover:text-white transition-colors">Why PIVA</a>
+                    <a href="#testimonials" class="hover:text-white transition-colors">Testimonials</a>
+                    <a href="#contact" class="hover:text-white transition-colors">Contact</a>
                 </div>
 
-                <!-- Socials -->
-                <div class="flex items-center space-x-5 text-slate-400 text-base">
-                    <a href="#" class="hover:text-cyan-400 transition-colors" aria-label="X / Twitter"><i class="fa-brands fa-x-twitter"></i></a>
-                    <a href="#" class="hover:text-cyan-400 transition-colors" aria-label="GitHub"><i class="fa-brands fa-github"></i></a>
-                    <a href="#" class="hover:text-cyan-400 transition-colors" aria-label="LinkedIn"><i class="fa-brands fa-linkedin"></i></a>
-                    <a href="#" class="hover:text-cyan-400 transition-colors" aria-label="Discord"><i class="fa-brands fa-discord"></i></a>
+                <div class="flex items-center gap-4 text-slate-400">
+                    <a href="#" class="hover:text-white transition-colors" aria-label="X"><i class="fa-brands fa-x-twitter"></i></a>
+                    <a href="#" class="hover:text-white transition-colors" aria-label="GitHub"><i class="fa-brands fa-github"></i></a>
+                    <a href="#" class="hover:text-white transition-colors" aria-label="LinkedIn"><i class="fa-brands fa-linkedin"></i></a>
                 </div>
             </div>
-
-            <div class="max-w-7xl mx-auto text-center mt-8 pt-8 border-t border-slate-900/60 text-[11px] font-mono text-slate-600">
-                &copy; 2026 PIVA Quantum Architecture Inc. Engineered with 8D Spatial Matrix Engine v4.8.
+            <div class="max-w-6xl mx-auto text-center mt-8 pt-8 border-t border-white/5 text-xs text-slate-600">
+                © 2026 PIVA Studio. Designed &amp; built with WebGL.
             </div>
         </footer>
-
     </main>
 
-    <!-- JavaScript: Multi-Layer Three.js Scene Setup & 8D Scroll Trigger Matrix -->
     <script>
-        // Form Success Toggle
-        function showFormSuccess() {
+        function showFormSuccess(){
             document.getElementById('piva-contact-form').classList.add('hidden');
             document.getElementById('form-success').classList.remove('hidden');
         }
 
-        // Mobile Nav Toggle
         const mobileBtn = document.getElementById('mobile-menu-btn');
         const mobileMenu = document.getElementById('mobile-menu');
-        const mobileLinks = document.querySelectorAll('.mobile-link');
+        const mobileIcon = document.getElementById('mobile-menu-icon');
+        mobileBtn.addEventListener('click', () => {
+            mobileMenu.classList.toggle('hidden');
+            mobileIcon.classList.toggle('fa-bars');
+            mobileIcon.classList.toggle('fa-xmark');
+        });
+        document.querySelectorAll('.mobile-link').forEach(l => l.addEventListener('click', () => {
+            mobileMenu.classList.add('hidden');
+            mobileIcon.classList.add('fa-bars');
+            mobileIcon.classList.remove('fa-xmark');
+        }));
 
-        mobileBtn.addEventListener('click', () => mobileMenu.classList.toggle('hidden'));
-        mobileLinks.forEach(link => link.addEventListener('click', () => mobileMenu.classList.add('hidden')));
-
-        /* ==========================================================================
-           8D MULTIDIMENSIONAL THREE.JS SPATIAL ENGINE
-           ========================================================================== */
-
+        /* ===================== 3D SCENE ===================== */
         gsap.registerPlugin(ScrollTrigger);
 
-        // 1. Scene & Canvas Initialization
         const container = document.getElementById('webgl-container');
         const scene = new THREE.Scene();
-        scene.fog = new THREE.FogExp2(0x020308, 0.03);
+        scene.fog = new THREE.FogExp2(0x05060a, 0.03);
 
-        // 2. Camera Setup
-        const camera = new THREE.PerspectiveCamera(60, window.innerWidth / window.innerHeight, 0.1, 1000);
+        const camera = new THREE.PerspectiveCamera(60, innerWidth/innerHeight, 0.1, 1000);
         camera.position.set(0, 0, 7);
 
-        // 3. Renderer Setup
-        const renderer = new THREE.WebGLRenderer({ antialias: true, alpha: true, powerPreference: "high-performance" });
-        renderer.setSize(window.innerWidth, window.innerHeight);
-        renderer.setPixelRatio(Math.min(window.devicePixelRatio, 2));
+        const renderer = new THREE.WebGLRenderer({ antialias:true, alpha:true, powerPreference:"high-performance" });
+        renderer.setSize(innerWidth, innerHeight);
+        renderer.setPixelRatio(Math.min(devicePixelRatio, 2));
         renderer.toneMapping = THREE.ACESFilmicToneMapping;
-        renderer.toneMappingExposure = 1.25;
+        renderer.toneMappingExposure = 1.1;
         container.appendChild(renderer.domElement);
 
-        // 4. Create 8D Multidimensional Layered Geometries
-        const main8DGroup = new THREE.Group();
-main8DGroup.scale.set(0.7, 0.7, 0.7); // 1 = 100%, 0.7 = 70%
-scene.add(main8DGroup);
+        const group = new THREE.Group();
+        group.scale.set(0.75, 0.75, 0.75);
+        scene.add(group);
 
-        // LAYER 1: Core Fractal Torus Knot (Inner Quantum Core)
-        const torusKnotGeo = new THREE.TorusKnotGeometry(1.6, 0.42, 180, 32, 3, 5);
-        const coreMaterial = new THREE.MeshPhysicalMaterial({
-            color: 0x00f2fe,
-            emissive: 0x110022,
-            roughness: 0.1,
-            metalness: 0.8,
-            clearcoat: 1.0,
-            clearcoatRoughness: 0.1,
-            wireframe: false,
-            flatShading: true,
-            transparent: true,
-            opacity: 0.85
+        const coreMat = new THREE.MeshPhysicalMaterial({
+            color: 0xbe185d, emissive: 0x1a0510, roughness: 0.15, metalness: 0.75,
+            clearcoat: 1.0, clearcoatRoughness: 0.15, flatShading: true, transparent: true, opacity: 0.88
         });
-        const coreMesh = new THREE.Mesh(torusKnotGeo, coreMaterial);
-        main8DGroup.add(coreMesh);
+        const coreMesh = new THREE.Mesh(new THREE.TorusKnotGeometry(1.6, 0.4, 170, 28, 2, 3), coreMat);
+        group.add(coreMesh);
 
-        // LAYER 2: Outer Wireframe Shell (Gyroid / Icosahedron Network)
-        const outerShellGeo = new THREE.IcosahedronGeometry(3.2, 2);
-        const wireframeGeo = new THREE.WireframeGeometry(outerShellGeo);
-        const shellMaterial = new THREE.LineBasicMaterial({
-            color: 0x8a2be2,
-            transparent: true,
-            opacity: 0.35,
-            linewidth: 1.5
-        });
-        const outerWireframe = new THREE.LineSegments(wireframeGeo, shellMaterial);
-        main8DGroup.add(outerWireframe);
+        const shellMat = new THREE.LineBasicMaterial({ color: 0x7c3aed, transparent: true, opacity: 0.28 });
+        const outerWireframe = new THREE.LineSegments(new THREE.WireframeGeometry(new THREE.IcosahedronGeometry(3.1, 1)), shellMat);
+        group.add(outerWireframe);
 
-        // LAYER 3: Dual Orbital Gyroid Rings
-        const ringGeo1 = new THREE.TorusGeometry(4.2, 0.03, 16, 100);
-        const ringMat1 = new THREE.MeshBasicMaterial({ color: 0x00f2fe, transparent: true, opacity: 0.5 });
-        const ring1 = new THREE.Mesh(ringGeo1, ringMat1);
-        ring1.rotation.x = Math.PI / 3;
-        main8DGroup.add(ring1);
-
-        const ringGeo2 = new THREE.TorusGeometry(4.8, 0.02, 16, 100);
-        const ringMat2 = new THREE.MeshBasicMaterial({ color: 0xf59e0b, transparent: true, opacity: 0.4 });
-        const ring2 = new THREE.Mesh(ringGeo2, ringMat2);
-        ring2.rotation.y = Math.PI / 4;
-        main8DGroup.add(ring2);
-
-        // LAYER 4: Floating HUD Coordinate Target Marker
-        const hudGeo = new THREE.RingGeometry(2.2, 2.24, 64);
-        const hudMat = new THREE.MeshBasicMaterial({ color: 0x10b981, side: THREE.DoubleSide, transparent: true, opacity: 0.3 });
-        const hudRing = new THREE.Mesh(hudGeo, hudMat);
-        hudRing.rotation.x = Math.PI / 2;
-        main8DGroup.add(hudRing);
-
-        // LAYER 5: Quantum Particle Cloud Field
-        const particleCount = 1200;
+        const particleCount = 420;
+        const positions = new Float32Array(particleCount*3);
+        const colors = new Float32Array(particleCount*3);
+        const cA = new THREE.Color(0xec4899), cB = new THREE.Color(0x8b5cf6), cW = new THREE.Color(0xe6ecf5);
+        for (let i=0; i<particleCount*3; i+=3){
+            positions[i]=(Math.random()-0.5)*22; positions[i+1]=(Math.random()-0.5)*22; positions[i+2]=(Math.random()-0.5)*22;
+            const c = Math.random() < 0.45 ? cA : (Math.random() < 0.8 ? cB : cW);
+            colors[i]=c.r; colors[i+1]=c.g; colors[i+2]=c.b;
+        }
         const particleGeo = new THREE.BufferGeometry();
-        const posArray = new Float32Array(particleCount * 3);
-        const colorArray = new Float32Array(particleCount * 3);
+        particleGeo.setAttribute('position', new THREE.BufferAttribute(positions,3));
+        particleGeo.setAttribute('color', new THREE.BufferAttribute(colors,3));
+        const particles = new THREE.Points(particleGeo, new THREE.PointsMaterial({ size:0.035, vertexColors:true, transparent:true, opacity:0.5, blending:THREE.AdditiveBlending }));
+        scene.add(particles);
 
-        const cCyan = new THREE.Color(0x00f2fe);
-        const cViolet = new THREE.Color(0x8a2be2);
-        const cGold = new THREE.Color(0xf59e0b);
+        scene.add(new THREE.AmbientLight(0xffffff, 0.35));
+        const lightA = new THREE.PointLight(0xec4899, 2.4, 30); lightA.position.set(6,6,6); scene.add(lightA);
+        const lightB = new THREE.PointLight(0x8b5cf6, 2.2, 30); lightB.position.set(-6,-5,-4); scene.add(lightB);
+        const lightC = new THREE.PointLight(0xffffff, 0.9, 25); lightC.position.set(0,2,9); scene.add(lightC);
 
-        for (let i = 0; i < particleCount * 3; i += 3) {
-            posArray[i] = (Math.random() - 0.5) * 24;
-            posArray[i + 1] = (Math.random() - 0.5) * 24;
-            posArray[i + 2] = (Math.random() - 0.5) * 24;
-
-            const rand = Math.random();
-            const pickedColor = rand < 0.4 ? cCyan : (rand < 0.8 ? cViolet : cGold);
-            colorArray[i] = pickedColor.r;
-            colorArray[i + 1] = pickedColor.g;
-            colorArray[i + 2] = pickedColor.b;
-        }
-
-        particleGeo.setAttribute('position', new THREE.BufferAttribute(posArray, 3));
-        particleGeo.setAttribute('color', new THREE.BufferAttribute(colorArray, 3));
-
-        const particleMat = new THREE.PointsMaterial({
-            size: 0.045,
-            vertexColors: true,
-            transparent: true,
-            opacity: 0.75,
-            blending: THREE.AdditiveBlending
+        let mouseX=0, mouseY=0, tX=0, tY=0;
+        const glow = document.getElementById('cursor-glow');
+        document.addEventListener('mousemove', e => {
+            mouseX = (e.clientX - innerWidth/2) * 0.0007;
+            mouseY = (e.clientY - innerHeight/2) * 0.0007;
+            glow.style.left = e.clientX + 'px';
+            glow.style.top = e.clientY + 'px';
         });
 
-        const particleSystem = new THREE.Points(particleGeo, particleMat);
-        scene.add(particleSystem);
+        const coreProxy = { r:0.745, g:0.094, b:0.365 };
+        const shellProxy = { r:0.486, g:0.227, b:0.929 };
+        function sync(){ coreMat.color.setRGB(coreProxy.r, coreProxy.g, coreProxy.b); shellMat.color.setRGB(shellProxy.r, shellProxy.g, shellProxy.b); }
 
-        // 5. Multi-Point Volumetric Lights
-        const ambientLight = new THREE.AmbientLight(0xffffff, 0.3);
-        scene.add(ambientLight);
+        const tl = gsap.timeline({ scrollTrigger: { trigger: "body", start:"top top", end:"bottom bottom", scrub:2.2 } });
+        tl.to(group.position, { x:2.6, y:-0.5, z:0.4 }, 0)
+          .to(group.rotation, { x:Math.PI*0.4, y:Math.PI*0.6 }, 0)
+          .to(coreProxy, { r:0.486, g:0.227, b:0.929, onUpdate:sync }, 0.3)
+          .to(shellProxy, { r:0.745, g:0.094, b:0.365, onUpdate:sync }, 0.3)
+          .to(group.position, { x:-2.4, y:0.3, z:1.0 }, 0.55)
+          .to(group.scale, { x:1.3, y:1.3, z:1.3 }, 0.55)
+          .to(group.position, { x:0, y:-1.0, z:-1.6 }, 1)
+          .to(group.scale, { x:1.9, y:1.9, z:1.9 }, 1);
 
-        const cyanPointLight = new THREE.PointLight(0x00f2fe, 3, 30);
-        cyanPointLight.position.set(6, 6, 6);
-        scene.add(cyanPointLight);
-
-        const violetPointLight = new THREE.PointLight(0x8a2be2, 3, 30);
-        violetPointLight.position.set(-6, -6, -4);
-        scene.add(violetPointLight);
-
-        const goldPointLight = new THREE.PointLight(0xf59e0b, 2, 25);
-        goldPointLight.position.set(0, 8, -5);
-        scene.add(goldPointLight);
-
-        // 6. Interactive Mouse & Liquid Glow Tracking
-        let mouseX = 0, mouseY = 0;
-        let targetMouseX = 0, targetMouseY = 0;
-        const cursorGlow = document.getElementById('cursor-glow');
-
-        document.addEventListener('mousemove', (e) => {
-            mouseX = (e.clientX - window.innerWidth / 2) * 0.0008;
-            mouseY = (e.clientY - window.innerHeight / 2) * 0.0008;
-
-            // Liquid cursor follow
-            cursorGlow.style.left = `${e.clientX}px`;
-            cursorGlow.style.top = `${e.clientY}px`;
-        });
-
-                // 7. GSAP ScrollTrigger 8D Spatial Timeline
-        const scrollMatrix = gsap.timeline({
-            scrollTrigger: {
-                trigger: "body",
-                start: "top top",
-                end: "bottom bottom",
-                scrub: 1.5
-            }
-        });
-
-        // --- 8D COLOR ANIMATION HELPERS ---
-        // We animate plain objects, NOT the THREE.Color directly, to avoid corrupting it.
-        const coreColorProxy = { r: 0.0, g: 0.95, b: 0.99 }; // Starting Cyan
-        const shellColorProxy = { r: 0.54, g: 0.17, b: 0.88 }; // Starting Violet
-
-        // Sync proxies to actual materials on every frame
-        function syncMaterials() {
-            coreMaterial.color.setRGB(coreColorProxy.r, coreColorProxy.g, coreColorProxy.b);
-            shellMaterial.color.setRGB(shellColorProxy.r, shellColorProxy.g, shellColorProxy.b);
-        }
-
-        // Helper to animate colors safely
-        function animateColors(cR, cG, cB, sR, sG, sB, position) {
-            scrollMatrix.to(coreColorProxy, { r: cR, g: cG, b: cB, onUpdate: syncMaterials }, position);
-            scrollMatrix.to(shellColorProxy, { r: sR, g: sG, b: sB, onUpdate: syncMaterials }, position);
-        }
-
-        // --- TIMELINE ---
-
-        // Section 1 -> About: Violet Core / Cyan Shell
-        scrollMatrix
-            .to(main8DGroup.position, { x: 2.8, y: -0.6, z: 0.5 }, 0)
-            .to(main8DGroup.rotation, { x: Math.PI * 0.5, y: Math.PI * 0.8 }, 0);
-        animateColors(0.54, 0.17, 0.88, 0.0, 0.95, 0.99, 0);
-
-        // Section 2 -> Services: Emerald Core / Gold Shell
-        scrollMatrix
-            .to(main8DGroup.position, { x: -2.8, y: 0.4, z: 1.2 }, 0.25)
-            .to(main8DGroup.scale, { x: 1.25, y: 1.25, z: 1.25 }, 0.25);
-        animateColors(0.06, 0.72, 0.51, 0.96, 0.62, 0.04, 0.25);
-
-        // Section 3 -> Why PIVA: Gold Core / Violet Shell
-        scrollMatrix
-            .to(main8DGroup.position, { x: 0, y: 0, z: 2.8 }, 0.5)
-            .to(main8DGroup.scale, { x: 1.5, y: 1.5, z: 1.5 }, 0.5);
-        animateColors(0.96, 0.62, 0.04, 0.54, 0.17, 0.88, 0.5);
-
-        // Section 4 -> Testimonials: Cyan Core / Emerald Shell
-        scrollMatrix
-            .to(main8DGroup.position, { x: 2.5, y: 1.0, z: 0.8 }, 0.75)
-            .to(main8DGroup.rotation, { z: Math.PI * 1.5 }, 0.75);
-        animateColors(0.0, 0.95, 0.99, 0.06, 0.72, 0.51, 0.75);
-
-        // Section 5 -> Contact & Footer: Violet Core / Cyan Shell
-        scrollMatrix
-            .to(main8DGroup.position, { x: 0, y: -1.2, z: -2.0 }, 1)
-            .to(main8DGroup.scale, { x: 2.2, y: 2.2, z: 2.2 }, 1);
-        animateColors(0.54, 0.17, 0.88, 0.0, 0.95, 0.99, 1);
-
-        // 8. Element Reveal Animations
         gsap.utils.toArray('.gs-reveal').forEach(el => {
-            gsap.fromTo(el, 
-                { opacity: 0, y: 45 }, 
-                {
-                    opacity: 1,
-                    y: 0,
-                    duration: 1.2,
-                    ease: "power3.out",
-                    scrollTrigger: {
-                        trigger: el,
-                        start: "top 86%",
-                        toggleActions: "play none none reverse"
-                    }
-                }
-            );
+            gsap.fromTo(el, { opacity:0, y:36 }, {
+                opacity:1, y:0, duration:1, ease:"power3.out",
+                scrollTrigger: { trigger: el, start:"top 88%", toggleActions:"play none none reverse" }
+            });
         });
 
-        // 9. Resize Handling
-        window.addEventListener('resize', () => {
-            camera.aspect = window.innerWidth / window.innerHeight;
+        addEventListener('resize', () => {
+            camera.aspect = innerWidth/innerHeight;
             camera.updateProjectionMatrix();
-            renderer.setSize(window.innerWidth, window.innerHeight);
+            renderer.setSize(innerWidth, innerHeight);
         });
 
-                // 10. Continuous 8D Render Loop
         const clock = new THREE.Clock();
-
-        function animate() {
+        function animate(){
             requestAnimationFrame(animate);
-
-            const elapsedTime = clock.getElapsedTime();
-
-            // Continuous complex rotations across multiple axes
-            coreMesh.rotation.x = elapsedTime * 0.25;
-            coreMesh.rotation.y = elapsedTime * 0.35;
-
-            outerWireframe.rotation.x = elapsedTime * -0.15;
-            outerWireframe.rotation.z = elapsedTime * 0.2;
-
-            ring1.rotation.z = elapsedTime * 0.3;
-            ring2.rotation.x = elapsedTime * -0.25;
-            hudRing.rotation.z = elapsedTime * -0.1;
-
-            particleSystem.rotation.y = elapsedTime * 0.025;
-
-            // Parallax interpolation
-            targetMouseX += (mouseX - targetMouseX) * 0.05;
-            targetMouseY += (mouseY - targetMouseY) * 0.05;
-
-            scene.rotation.y = targetMouseX;
-            scene.rotation.x = targetMouseY;
-
+            const t = clock.getElapsedTime();
+            coreMesh.rotation.x = t*0.16; coreMesh.rotation.y = t*0.22;
+            outerWireframe.rotation.x = -t*0.08; outerWireframe.rotation.z = t*0.11;
+            particles.rotation.y = t*0.015;
+            tX += (mouseX-tX)*0.05; tY += (mouseY-tY)*0.05;
+            scene.rotation.y = tX; scene.rotation.x = tY;
             renderer.render(scene, camera);
         }
-
-        // Start engine on window load
-        window.onload = function() {
-            // Initial sync of materials
-            syncMaterials();
-            animate();
-        };
+        gsap.to(coreMesh.scale, { x:1.06, y:1.06, z:1.06, duration:3.4, repeat:-1, yoyo:true, ease:"sine.inOut" });
+        sync();
+        animate();
     </script>
 </body>
 </html>
