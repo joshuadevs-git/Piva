@@ -25,57 +25,33 @@
 
     <script src="https://cdnjs.cloudflare.com/ajax/libs/three.js/r128/three.min.js"></script>
     <script src="https://cdnjs.cloudflare.com/ajax/libs/gsap/3.12.5/gsap.min.js"></script>
-    <script src="https://cdnjs.cloudflare.com/ajax/libs/gsap/3.12.5/ScrollTrigger.min.js"></script>
 
     <style>
-        :root{ --accent:#be185d; --accent-2:#4c1d95; box-sizing:border-box; padding-top:env(safe-area-inset-top,0px); padding-bottom:env(safe-area-inset-bottom,0px); }
-        html{ scroll-padding-top:env(safe-area-inset-top,0px); }
+        :root{ --accent:#be185d; --accent-2:#4c1d95; color-scheme:light; box-sizing:border-box; padding-top:env(safe-area-inset-top,0px); padding-bottom:env(safe-area-inset-bottom,0px); }
+        html{ scroll-padding-top:env(safe-area-inset-top,0px); background:#ffffff; }
         body{
-            background-color:#05060a;
-            background-image:
-                radial-gradient(ellipse 65% 55% at 12% 18%, rgba(190,24,93,0.14), transparent 60%),
-                radial-gradient(ellipse 60% 50% at 88% 15%, rgba(76,29,149,0.14), transparent 60%),
-                radial-gradient(ellipse 70% 60% at 50% 100%, rgba(76,29,149,0.12), transparent 65%);
-            background-attachment:fixed;
-            color:#eef1f6;
+            background-color:#ffffff;
+            color:#0f172a;
             overflow-x:hidden;
         }
 
-        #webgl-container{
-            position:fixed; inset:0; width:100vw; height:100vh;
-            z-index:0; pointer-events:none; mix-blend-mode:screen;
-        }
-
-        #vignette{
-            position:fixed; inset:0; z-index:1; pointer-events:none;
-            background:radial-gradient(ellipse at center, transparent 45%, rgba(5,6,10,0.55) 100%);
-        }
-
-        #cursor-glow{
-            position:fixed; width:480px; height:480px; border-radius:50%;
-            background:radial-gradient(circle, rgba(190,24,93,0.08) 0%, rgba(76,29,149,0.06) 45%, rgba(0,0,0,0) 70%);
-            pointer-events:none; z-index:2; transform:translate(-50%,-50%);
-            transition:opacity .3s; will-change:transform;
-        }
-
         .glass-panel{
-            background:rgba(255,255,255,0.035);
-            backdrop-filter:blur(20px);
-            -webkit-backdrop-filter:blur(20px);
-            border:1px solid rgba(255,255,255,0.08);
+            background:#ffffff;
+            border:1px solid rgba(15,23,42,0.10);
+            box-shadow:0 1px 2px rgba(15,23,42,0.04);
             transition:border-color .4s ease, transform .4s ease, box-shadow .4s ease;
         }
         .glass-panel:hover{
             border-color:rgba(190,24,93,0.35);
-            box-shadow:0 20px 50px rgba(0,0,0,0.35);
+            box-shadow:0 18px 40px rgba(15,23,42,0.08);
             transform:translateY(-3px);
         }
 
         .glass-nav{
-            background:rgba(5,6,10,0.78);
+            background:rgba(255,255,255,0.88);
             backdrop-filter:blur(20px);
             -webkit-backdrop-filter:blur(20px);
-            border-bottom:1px solid rgba(255,255,255,0.06);
+            border-bottom:1px solid rgba(15,23,42,0.08);
             padding-top:env(safe-area-inset-top,0px);
         }
 
@@ -90,18 +66,18 @@
         }
         .btn-primary:hover{ filter:brightness(1.12); transform:translateY(-1px); }
 
-        .svc-arrow:disabled{ opacity:.3; cursor:not-allowed; transform:none !important; border-color:rgba(255,255,255,0.08) !important; box-shadow:none !important; }
+        .svc-arrow:disabled{ opacity:.3; cursor:not-allowed; transform:none !important; border-color:rgba(15,23,42,0.08) !important; box-shadow:none !important; }
         .svc-arrow:not(:disabled):hover{ border-color:rgba(190,24,93,0.6); }
 
         .btn-outline{
-            border:1px solid rgba(255,255,255,0.16);
+            border:1px solid rgba(15,23,42,0.18);
             transition:border-color .3s ease, background .3s ease;
         }
-        .btn-outline:hover{ border-color:rgba(190,24,93,0.5); background:rgba(255,255,255,0.04); }
+        .btn-outline:hover{ border-color:rgba(190,24,93,0.5); background:rgba(15,23,42,0.03); }
 
         ::-webkit-scrollbar{ width:6px; }
-        ::-webkit-scrollbar-track{ background:#05060a; }
-        ::-webkit-scrollbar-thumb{ background:#1e2433; border-radius:3px; }
+        ::-webkit-scrollbar-track{ background:#ffffff; }
+        ::-webkit-scrollbar-thumb{ background:#cbd5e1; border-radius:3px; }
         ::-webkit-scrollbar-thumb:hover{ background:var(--accent); }
 
         input:focus, select:focus, textarea:focus{ border-color:var(--accent) !important; }
@@ -109,83 +85,84 @@
 </head>
 <body class="font-sans antialiased selection:bg-pink-700 selection:text-white">
 
-    <div id="webgl-container"></div>
-    <div id="vignette"></div>
-    <div id="cursor-glow"></div>
-
     <!-- NAV -->
     <header class="fixed top-0 left-0 w-full z-50 glass-nav">
         <div class="max-w-7xl mx-auto px-6 py-4 flex items-center justify-between">
             <a href="#" class="flex items-center gap-2.5">
-                <div class="w-8 h-8 rounded-lg bg-white/5 border border-white/10 flex items-center justify-center font-heading font-bold text-sm text-white">P</div>
-                <span class="font-heading font-bold text-lg tracking-tight text-white">PIVA</span>
+                <div class="w-8 h-8 rounded-lg bg-slate-900/5 border border-slate-900/10 flex items-center justify-center font-heading font-bold text-sm text-slate-900">P</div>
+                <span class="font-heading font-bold text-lg tracking-tight text-slate-900">PIVA</span>
             </a>
 
-            <nav class="hidden md:flex items-center gap-8 text-sm text-slate-300">
-                <a href="#about" class="hover:text-white transition-colors">About</a>
-                <a href="#services" class="hover:text-white transition-colors">Services</a>
-                <a href="#why-piva" class="hover:text-white transition-colors">Why PIVA</a>
-                <a href="#testimonials" class="hover:text-white transition-colors">Testimonials</a>
+            <nav class="hidden md:flex items-center gap-8 text-sm text-slate-600">
+                <a href="#about" class="hover:text-slate-900 transition-colors">About</a>
+                <a href="#services" class="hover:text-slate-900 transition-colors">Services</a>
+                <a href="#why-piva" class="hover:text-slate-900 transition-colors">Why PIVA</a>
+                <a href="#testimonials" class="hover:text-slate-900 transition-colors">Testimonials</a>
             </nav>
 
             <div class="flex items-center gap-4">
                 <a href="#contact" class="hidden sm:inline-flex items-center gap-2 px-5 py-2.5 rounded-full text-sm font-medium text-white btn-primary">
                     Book a discovery call
                 </a>
-                <button id="mobile-menu-btn" class="md:hidden text-slate-300 hover:text-white p-2" aria-label="Toggle navigation">
+                <button id="mobile-menu-btn" class="md:hidden text-slate-600 hover:text-slate-900 p-2" aria-label="Toggle navigation">
                     <i class="fa-solid fa-bars text-lg" id="mobile-menu-icon"></i>
                 </button>
             </div>
         </div>
 
-        <div id="mobile-menu" class="hidden md:hidden border-t border-white/5 px-6 py-6 space-y-4">
-            <a href="#about" class="block text-slate-300 hover:text-white text-base mobile-link">About</a>
-            <a href="#services" class="block text-slate-300 hover:text-white text-base mobile-link">Services</a>
-            <a href="#why-piva" class="block text-slate-300 hover:text-white text-base mobile-link">Why PIVA</a>
-            <a href="#testimonials" class="block text-slate-300 hover:text-white text-base mobile-link">Testimonials</a>
+        <div id="mobile-menu" class="hidden md:hidden border-t border-slate-900/10 px-6 py-6 space-y-4">
+            <a href="#about" class="block text-slate-600 hover:text-slate-900 text-base mobile-link">About</a>
+            <a href="#services" class="block text-slate-600 hover:text-slate-900 text-base mobile-link">Services</a>
+            <a href="#why-piva" class="block text-slate-600 hover:text-slate-900 text-base mobile-link">Why PIVA</a>
+            <a href="#testimonials" class="block text-slate-600 hover:text-slate-900 text-base mobile-link">Testimonials</a>
             <a href="#contact" class="block w-full text-center px-6 py-3 rounded-full text-sm font-medium text-white btn-primary mobile-link">Book a discovery call</a>
         </div>
     </header>
 
-    <main class="relative z-10">
+    <main class="relative">
 
        <!-- HERO -->
-        <section id="hero" class="min-h-screen flex items-center justify-start pt-32 pb-20 px-6 lg:px-16">
-            <div class="max-w-2xl space-y-8">
-                <!-- <div class="inline-flex items-center gap-2 px-4 py-1.5 rounded-full border border-white/10 bg-white/5 text-slate-300 text-sm">
-                    3D digital experience studio
-                </div> -->
+        <section id="hero" class="relative min-h-screen flex items-center pt-32 pb-20 px-6">
+            <div class="max-w-7xl mx-auto w-full grid grid-cols-1 lg:grid-cols-2 gap-10 lg:gap-6 items-center">
+                <div class="max-w-2xl space-y-8">
+                    <!-- <div class="inline-flex items-center gap-2 px-4 py-1.5 rounded-full border border-slate-900/10 bg-slate-900/5 text-slate-600 text-sm">
+                        3D digital experience studio
+                    </div> -->
 
-                <h1 class="font-heading text-4xl sm:text-6xl md:text-7xl font-bold tracking-tight leading-[1.05]">
-                    Your Vision
-                    <span class="text-gradient">Our Strategy.</span>
-                </h1>
+                    <h1 class="font-heading text-4xl sm:text-6xl md:text-7xl font-bold tracking-tight leading-[1.05]">
+                        Your Vision
+                        <span class="text-gradient">Our Strategy.</span>
+                    </h1>
 
-                <p class="text-lg text-slate-400 max-w-xl leading-relaxed">
-                    PIVA Marketing helps small and growing businesses build a stronger online presence, attract the 
-                    right customers, and turn leads into real sales.
-                </p>
+                    <p class="text-lg text-slate-600 max-w-xl leading-relaxed">
+                        PIVA Marketing helps small and growing businesses build a stronger online presence, attract the 
+                        right customers, and turn leads into real sales.
+                    </p>
 
-                <div class="flex flex-col sm:flex-row items-start sm:items-center gap-4 pt-4">
-                    <a href="#contact" class="w-full sm:w-auto px-8 py-3.5 rounded-full text-sm font-medium text-white btn-primary text-center">
-                        Start Your Project
-                    </a>
-                    <a href="#services" class="w-full sm:w-auto px-8 py-3.5 rounded-full text-sm font-medium text-white btn-outline text-center">
-                        Explore Our Services
-                    </a>
+                    <div class="flex flex-col sm:flex-row items-start sm:items-center gap-4 pt-4">
+                        <a href="#contact" class="w-full sm:w-auto px-8 py-3.5 rounded-full text-sm font-medium text-white btn-primary text-center">
+                            Start Your Project
+                        </a>
+                        <a href="#services" class="w-full sm:w-auto px-8 py-3.5 rounded-full text-sm font-medium text-slate-900 btn-outline text-center">
+                            Explore Our Services
+                        </a>
+                    </div>
                 </div>
+
+                <!-- Hero animation: growth chart + audience target + leads + revenue coins -->
+                <div id="hero-3d" class="relative w-full min-w-0 h-[380px] sm:h-[460px] lg:h-[580px]" aria-hidden="true"></div>
             </div>
         </section>
 
          <!-- ABOUT -->
         <section id="about" class="py-28 px-6">
             <div class="max-w-6xl mx-auto">
-                <div class="max-w-2xl mb-16 gs-reveal">
+                <div class="max-w-2xl mb-16">
                     <p class="text-[color:var(--accent)] text-sm mb-3">ABOUT PIVA</p>
                     <h2 class="font-heading text-3xl sm:text-4xl font-bold tracking-tight leading-tight mb-5">
                         Your Growth Partner in the Digital World.
                     </h2>
-                    <p class="text-slate-400 leading-relaxed">
+                    <p class="text-slate-600 leading-relaxed">
                         PIVA Marketing was created to help small businesses and growing
                         brands get the right tools. the right strategy, and the right
                         support to stand out, get found, and grow with confidence
@@ -193,32 +170,32 @@
                 </div>
 
                 <div class="grid grid-cols-1 md:grid-cols-3 gap-6">
-                    <div class="glass-panel p-8 rounded-2xl space-y-4 gs-reveal">
+                    <div class="glass-panel p-8 rounded-2xl space-y-4">
                         <div class="w-11 h-11 rounded-xl bg-[color:var(--accent)]/10 border border-[color:var(--accent)]/25 flex items-center justify-center text-[color:var(--accent)] text-lg">
                             <i class="fa-solid fa-eye"></i>
                         </div>
-                        <h3 class="font-heading text-xl font-semibold text-white">Our Vision</h3>
-                        <p class="text-slate-400 text-sm leading-relaxed">
+                        <h3 class="font-heading text-xl font-semibold text-slate-900">Our Vision</h3>
+                        <p class="text-slate-600 text-sm leading-relaxed">
                             To empower businesses with the digital presence and systems they need to grow with confidence.
                         </p>
                     </div>
 
-                    <div class="glass-panel p-8 rounded-2xl space-y-4 gs-reveal">
+                    <div class="glass-panel p-8 rounded-2xl space-y-4">
                         <div class="w-11 h-11 rounded-xl bg-[color:var(--accent-2)]/10 border border-[color:var(--accent-2)]/25 flex items-center justify-center text-[color:var(--accent-2)] text-lg">
                             <i class="fa-solid fa-bullseye text-pink-500"></i>
                         </div>
-                        <h3 class="font-heading text-xl font-semibold text-white">Our Mission</h3>
-                        <p class="text-slate-400 text-sm leading-relaxed">
+                        <h3 class="font-heading text-xl font-semibold text-slate-900">Our Mission</h3>
+                        <p class="text-slate-600 text-sm leading-relaxed">
                             We help businesses look professional, reach the right audience, capture opportunities, and build systems for long-term growth.
                         </p>
                     </div>
 
-                    <div class="glass-panel p-8 rounded-2xl space-y-4 gs-reveal">
+                    <div class="glass-panel p-8 rounded-2xl space-y-4">
                         <div class="w-11 h-11 rounded-xl bg-[color:var(--accent)]/10 border border-[color:var(--accent)]/25 flex items-center justify-center text-[color:var(--accent)] text-lg">
                             <i class="fa-solid fa-star text-pink-500"></i>
                         </div>
-                        <h3 class="font-heading text-xl font-semibold text-white">Why Chooose PIVA</h3>
-                        <p class="text-slate-400 text-sm leading-relaxed">
+                        <h3 class="font-heading text-xl font-semibold text-slate-900">Why Chooose PIVA</h3>
+                        <p class="text-slate-600 text-sm leading-relaxed">
                             Strategy + Creativity + Technology = Real businesses Growth.
                         </p>
                     </div>
@@ -230,18 +207,18 @@
         <!-- SERVICES -->
         <section id="services" class="py-28 px-6">
             <div class="max-w-6xl mx-auto">
-                <div class="max-w-2xl mb-14 gs-reveal">
+                <div class="max-w-2xl mb-14">
                     <h2 class="font-heading text-3xl sm:text-4xl font-bold tracking-tight leading-tight mb-4">
                         Complete digital marketing solutions for your business.
                     </h2>
-                    <p class="text-slate-400 leading-relaxed">
+                    <p class="text-slate-600 leading-relaxed">
                         From websites and branding to lead generation, automation, and CRM systems — we bring everything together to help you grow.
                     </p>
                 </div>
 
-                <div class="grid grid-cols-2 gap-y-6 md:grid-cols-[auto_1fr_auto] md:items-center md:gap-x-5 gs-reveal">
+                <div class="grid grid-cols-2 gap-y-6 md:grid-cols-[auto_1fr_auto] md:items-center md:gap-x-5">
                     <button id="svc-prev" type="button" aria-label="Previous services"
-                        class="svc-arrow justify-self-start w-11 h-11 rounded-full glass-panel flex items-center justify-center text-white">
+                        class="svc-arrow justify-self-start w-11 h-11 rounded-full glass-panel flex items-center justify-center text-slate-900">
                         <i class="fa-solid fa-chevron-left"></i>
                     </button>
 
@@ -250,7 +227,7 @@
                     </div>
 
                     <button id="svc-next" type="button" aria-label="Next services"
-                        class="svc-arrow justify-self-end w-11 h-11 rounded-full glass-panel flex items-center justify-center text-white">
+                        class="svc-arrow justify-self-end w-11 h-11 rounded-full glass-panel flex items-center justify-center text-slate-900">
                         <i class="fa-solid fa-chevron-right"></i>
                     </button>
                 </div>
@@ -263,11 +240,11 @@
         <section id="why-piva" class="py-28 px-6">
             <div class="max-w-6xl mx-auto">
                 <div class="grid grid-cols-1 lg:grid-cols-12 gap-12 items-center">
-                    <div class="lg:col-span-7 space-y-7 gs-reveal">
+                    <div class="lg:col-span-7 space-y-7">
                         <h2 class="font-heading text-3xl sm:text-4xl font-bold tracking-tight leading-tight">
                             Why teams choose PIVA
                         </h2>
-                        <p class="text-slate-400 leading-relaxed">
+                        <p class="text-slate-600 leading-relaxed">
                             We build bespoke 3D systems rather than templates — combining shader programming, motion design, and modern engineering practice to ship something that actually holds up in production.
                         </p>
 
@@ -277,8 +254,8 @@
                                     <i class="fa-solid fa-gauge-high"></i>
                                 </div>
                                 <div>
-                                    <h4 class="font-semibold text-white mb-1 text-base">Consistent frame rates</h4>
-                                    <p class="text-slate-400 text-sm">GPU-optimized rendering that holds 60fps+ across desktop and mobile.</p>
+                                    <h4 class="font-semibold text-slate-900 mb-1 text-base">Consistent frame rates</h4>
+                                    <p class="text-slate-600 text-sm">GPU-optimized rendering that holds 60fps+ across desktop and mobile.</p>
                                 </div>
                             </div>
 
@@ -287,8 +264,8 @@
                                     <i class="fa-solid fa-fingerprint"></i>
                                 </div>
                                 <div>
-                                    <h4 class="font-semibold text-white mb-1 text-base">Custom 3D systems</h4>
-                                    <p class="text-slate-400 text-sm">Original geometry and shader work built specifically for your brand — never a template.</p>
+                                    <h4 class="font-semibold text-slate-900 mb-1 text-base">Custom 3D systems</h4>
+                                    <p class="text-slate-600 text-sm">Original geometry and shader work built specifically for your brand — never a template.</p>
                                 </div>
                             </div>
 
@@ -297,29 +274,29 @@
                                     <i class="fa-solid fa-shield-halved"></i>
                                 </div>
                                 <div>
-                                    <h4 class="font-semibold text-white mb-1 text-base">Production-ready code</h4>
-                                    <p class="text-slate-400 text-sm">Clean, documented codebases built to scale with your engineering team.</p>
+                                    <h4 class="font-semibold text-slate-900 mb-1 text-base">Production-ready code</h4>
+                                    <p class="text-slate-600 text-sm">Clean, documented codebases built to scale with your engineering team.</p>
                                 </div>
                             </div>
                         </div>
                     </div>
 
-                    <div class="lg:col-span-5 grid grid-cols-2 gap-5 gs-reveal">
+                    <div class="lg:col-span-5 grid grid-cols-2 gap-5">
                         <div class="glass-panel p-7 rounded-2xl text-center space-y-2">
                             <div class="font-heading text-4xl font-bold text-[color:var(--accent)]">99.8%</div>
-                            <div class="text-slate-400 text-xs">Client retention</div>
+                            <div class="text-slate-600 text-xs">Client retention</div>
                         </div>
                         <div class="glass-panel p-7 rounded-2xl text-center space-y-2">
                             <div class="font-heading text-4xl font-bold text-[color:var(--accent-2)]">150+</div>
-                            <div class="text-slate-400 text-xs">Projects shipped</div>
+                            <div class="text-slate-600 text-xs">Projects shipped</div>
                         </div>
                         <div class="glass-panel p-7 rounded-2xl text-center space-y-2">
                             <div class="font-heading text-4xl font-bold text-[color:var(--accent-2)]">120fps</div>
-                            <div class="text-slate-400 text-xs">Peak frame rate</div>
+                            <div class="text-slate-600 text-xs">Peak frame rate</div>
                         </div>
                         <div class="glass-panel p-7 rounded-2xl text-center space-y-2">
                             <div class="font-heading text-4xl font-bold text-[color:var(--accent)]">18+</div>
-                            <div class="text-slate-400 text-xs">Design awards</div>
+                            <div class="text-slate-600 text-xs">Design awards</div>
                         </div>
                     </div>
                 </div>
@@ -329,45 +306,45 @@
         <!-- TESTIMONIALS -->
         <section id="testimonials" class="py-28 px-6">
             <div class="max-w-6xl mx-auto">
-                <h2 class="font-heading text-3xl sm:text-4xl font-bold tracking-tight text-center mb-16 gs-reveal">
+                <h2 class="font-heading text-3xl sm:text-4xl font-bold tracking-tight text-center mb-16">
                     Trusted by teams that ship
                 </h2>
 
                 <div class="grid grid-cols-1 md:grid-cols-3 gap-6">
-                    <div class="glass-panel p-8 rounded-2xl space-y-6 flex flex-col justify-between gs-reveal">
-                        <p class="text-slate-300 text-sm leading-relaxed">
+                    <div class="glass-panel p-8 rounded-2xl space-y-6 flex flex-col justify-between">
+                        <p class="text-slate-600 text-sm leading-relaxed">
                             PIVA's 3D work completely changed our brand launch. The scroll-triggered animation kept visitors on the site three times longer than our previous build.
                         </p>
-                        <div class="flex items-center gap-3 pt-4 border-t border-white/10">
-                            <div class="w-10 h-10 rounded-full bg-gradient-to-tr from-[color:var(--accent)] to-[color:var(--accent-2)] flex items-center justify-center font-semibold text-slate-950 text-sm">EV</div>
+                        <div class="flex items-center gap-3 pt-4 border-t border-slate-900/10">
+                            <div class="w-10 h-10 rounded-full bg-gradient-to-tr from-[color:var(--accent)] to-[color:var(--accent-2)] flex items-center justify-center font-semibold text-white text-sm">EV</div>
                             <div>
-                                <h4 class="font-semibold text-white text-sm">Elena Vance</h4>
+                                <h4 class="font-semibold text-slate-900 text-sm">Elena Vance</h4>
                                 <p class="text-slate-500 text-xs">CTO, Vale Labs</p>
                             </div>
                         </div>
                     </div>
 
-                    <div class="glass-panel p-8 rounded-2xl space-y-6 flex flex-col justify-between gs-reveal">
-                        <p class="text-slate-300 text-sm leading-relaxed">
+                    <div class="glass-panel p-8 rounded-2xl space-y-6 flex flex-col justify-between">
+                        <p class="text-slate-600 text-sm leading-relaxed">
                             The level of visual polish and performance work is hard to find elsewhere. They delivered something our whole board still talks about.
                         </p>
-                        <div class="flex items-center gap-3 pt-4 border-t border-white/10">
-                            <div class="w-10 h-10 rounded-full bg-gradient-to-tr from-[color:var(--accent-2)] to-[color:var(--accent)] flex items-center justify-center font-semibold text-slate-950 text-sm">MK</div>
+                        <div class="flex items-center gap-3 pt-4 border-t border-slate-900/10">
+                            <div class="w-10 h-10 rounded-full bg-gradient-to-tr from-[color:var(--accent-2)] to-[color:var(--accent)] flex items-center justify-center font-semibold text-white text-sm">MK</div>
                             <div>
-                                <h4 class="font-semibold text-white text-sm">Marcus Kincaid</h4>
+                                <h4 class="font-semibold text-slate-900 text-sm">Marcus Kincaid</h4>
                                 <p class="text-slate-500 text-xs">Head of Product, Aether AI</p>
                             </div>
                         </div>
                     </div>
 
-                    <div class="glass-panel p-8 rounded-2xl space-y-6 flex flex-col justify-between gs-reveal">
-                        <p class="text-slate-300 text-sm leading-relaxed">
+                    <div class="glass-panel p-8 rounded-2xl space-y-6 flex flex-col justify-between">
+                        <p class="text-slate-600 text-sm leading-relaxed">
                             Flawless engineering — complex 3D scenes with sub-second load times across every device we tested.
                         </p>
-                        <div class="flex items-center gap-3 pt-4 border-t border-white/10">
-                            <div class="w-10 h-10 rounded-full bg-gradient-to-tr from-[color:var(--accent)] to-[color:var(--accent-2)] flex items-center justify-center font-semibold text-slate-950 text-sm">SL</div>
+                        <div class="flex items-center gap-3 pt-4 border-t border-slate-900/10">
+                            <div class="w-10 h-10 rounded-full bg-gradient-to-tr from-[color:var(--accent)] to-[color:var(--accent-2)] flex items-center justify-center font-semibold text-white text-sm">SL</div>
                             <div>
-                                <h4 class="font-semibold text-white text-sm">Sophia Lin</h4>
+                                <h4 class="font-semibold text-slate-900 text-sm">Sophia Lin</h4>
                                 <p class="text-slate-500 text-xs">VP Design, Apex Global</p>
                             </div>
                         </div>
@@ -379,12 +356,12 @@
         <!-- CONTACT -->
         <section id="contact" class="py-28 px-6">
             <div class="max-w-3xl mx-auto">
-                <div class="glass-panel p-8 sm:p-12 rounded-3xl relative overflow-hidden gs-reveal">
+                <div class="glass-panel p-8 sm:p-12 rounded-3xl relative overflow-hidden">
                     <div class="text-center space-y-3 mb-10">
                         <h2 class="font-heading text-3xl sm:text-4xl font-bold tracking-tight">
                             Let's build something worth remembering
                         </h2>
-                        <p class="text-slate-400 text-sm max-w-lg mx-auto">
+                        <p class="text-slate-600 text-sm max-w-lg mx-auto">
                             Tell us about your project and our team will respond within 24 hours.
                         </p>
                     </div>
@@ -392,18 +369,18 @@
                     <form id="piva-contact-form" class="space-y-5" onsubmit="event.preventDefault(); showFormSuccess();">
                         <div class="grid grid-cols-1 sm:grid-cols-2 gap-5">
                             <div>
-                                <label class="block text-sm text-slate-400 mb-1.5">Name</label>
-                                <input type="text" required placeholder="Alex Mercer" class="w-full bg-black/30 border border-white/10 rounded-xl px-4 py-3 text-slate-100 placeholder-slate-600 focus:outline-none text-sm">
+                                <label class="block text-sm text-slate-600 mb-1.5">Name</label>
+                                <input type="text" required placeholder="Alex Mercer" class="w-full bg-white border border-slate-300 rounded-xl px-4 py-3 text-slate-900 placeholder-slate-400 focus:outline-none text-sm">
                             </div>
                             <div>
-                                <label class="block text-sm text-slate-400 mb-1.5">Email</label>
-                                <input type="email" required placeholder="alex@company.com" class="w-full bg-black/30 border border-white/10 rounded-xl px-4 py-3 text-slate-100 placeholder-slate-600 focus:outline-none text-sm">
+                                <label class="block text-sm text-slate-600 mb-1.5">Email</label>
+                                <input type="email" required placeholder="alex@company.com" class="w-full bg-white border border-slate-300 rounded-xl px-4 py-3 text-slate-900 placeholder-slate-400 focus:outline-none text-sm">
                             </div>
                         </div>
 
                         <div>
-                            <label class="block text-sm text-slate-400 mb-1.5">Project type</label>
-                            <select class="w-full bg-black/30 border border-white/10 rounded-xl px-4 py-3 text-slate-100 focus:outline-none text-sm">
+                            <label class="block text-sm text-slate-600 mb-1.5">Project type</label>
+                            <select class="w-full bg-white border border-slate-300 rounded-xl px-4 py-3 text-slate-900 focus:outline-none text-sm">
                                 <option>3D web experience</option>
                                 <option>AI-enhanced interface</option>
                                 <option>Brand &amp; motion design</option>
@@ -412,8 +389,8 @@
                         </div>
 
                         <div>
-                            <label class="block text-sm text-slate-400 mb-1.5">Project details</label>
-                            <textarea rows="4" required placeholder="Tell us what you're building..." class="w-full bg-black/30 border border-white/10 rounded-xl px-4 py-3 text-slate-100 placeholder-slate-600 focus:outline-none text-sm"></textarea>
+                            <label class="block text-sm text-slate-600 mb-1.5">Project details</label>
+                            <textarea rows="4" required placeholder="Tell us what you're building..." class="w-full bg-white border border-slate-300 rounded-xl px-4 py-3 text-slate-900 placeholder-slate-400 focus:outline-none text-sm"></textarea>
                         </div>
 
                         <button type="submit" class="w-full py-3.5 rounded-xl text-sm font-medium text-white btn-primary">
@@ -425,35 +402,35 @@
                         <div class="w-14 h-14 rounded-full bg-[color:var(--accent)]/15 text-[color:var(--accent)] flex items-center justify-center text-2xl mx-auto">
                             <i class="fa-solid fa-check"></i>
                         </div>
-                        <h3 class="text-xl font-semibold text-white">Message sent</h3>
-                        <p class="text-slate-400 text-sm">Thanks for reaching out — we'll be in touch within 24 hours.</p>
+                        <h3 class="text-xl font-semibold text-slate-900">Message sent</h3>
+                        <p class="text-slate-600 text-sm">Thanks for reaching out — we'll be in touch within 24 hours.</p>
                     </div>
                 </div>
             </div>
         </section>
 
-        <footer class="border-t border-white/5 py-10 px-6 glass-nav">
+        <footer class="border-t border-slate-900/10 py-10 px-6 glass-nav">
             <div class="max-w-6xl mx-auto flex flex-col md:flex-row items-center justify-between gap-6">
                 <div class="flex items-center gap-2.5">
-                    <div class="w-7 h-7 rounded-lg bg-white/5 border border-white/10 flex items-center justify-center text-white font-heading font-bold text-xs">P</div>
-                    <span class="font-heading font-semibold text-white">PIVA</span>
+                    <div class="w-7 h-7 rounded-lg bg-slate-900/5 border border-slate-900/10 flex items-center justify-center text-slate-900 font-heading font-bold text-xs">P</div>
+                    <span class="font-heading font-semibold text-slate-900">PIVA</span>
                 </div>
 
-                <div class="flex flex-wrap justify-center gap-6 text-sm text-slate-400">
-                    <a href="#about" class="hover:text-white transition-colors">About</a>
-                    <a href="#services" class="hover:text-white transition-colors">Services</a>
-                    <a href="#why-piva" class="hover:text-white transition-colors">Why PIVA</a>
-                    <a href="#testimonials" class="hover:text-white transition-colors">Testimonials</a>
-                    <a href="#contact" class="hover:text-white transition-colors">Contact</a>
+                <div class="flex flex-wrap justify-center gap-6 text-sm text-slate-600">
+                    <a href="#about" class="hover:text-slate-900 transition-colors">About</a>
+                    <a href="#services" class="hover:text-slate-900 transition-colors">Services</a>
+                    <a href="#why-piva" class="hover:text-slate-900 transition-colors">Why PIVA</a>
+                    <a href="#testimonials" class="hover:text-slate-900 transition-colors">Testimonials</a>
+                    <a href="#contact" class="hover:text-slate-900 transition-colors">Contact</a>
                 </div>
 
-                <div class="flex items-center gap-4 text-slate-400">
-                    <a href="#" class="hover:text-white transition-colors" aria-label="X"><i class="fa-brands fa-x-twitter"></i></a>
-                    <a href="#" class="hover:text-white transition-colors" aria-label="GitHub"><i class="fa-brands fa-github"></i></a>
-                    <a href="#" class="hover:text-white transition-colors" aria-label="LinkedIn"><i class="fa-brands fa-linkedin"></i></a>
+                <div class="flex items-center gap-4 text-slate-600">
+                    <a href="#" class="hover:text-slate-900 transition-colors" aria-label="X"><i class="fa-brands fa-x-twitter"></i></a>
+                    <a href="#" class="hover:text-slate-900 transition-colors" aria-label="GitHub"><i class="fa-brands fa-github"></i></a>
+                    <a href="#" class="hover:text-slate-900 transition-colors" aria-label="LinkedIn"><i class="fa-brands fa-linkedin"></i></a>
                 </div>
             </div>
-            <div class="max-w-6xl mx-auto text-center mt-8 pt-8 border-t border-white/5 text-xs text-slate-600">
+            <div class="max-w-6xl mx-auto text-center mt-8 pt-8 border-t border-slate-900/10 text-xs text-slate-500">
                 © 2026 PIVA Studio. Designed &amp; built with WebGL.
             </div>
         </footer>
@@ -515,16 +492,16 @@
 
                 grid.innerHTML = services.slice(first, first + pp).map(([icon, label], i) => {
                     const alt = (first + i) % 2;
-                    const tint = alt ? 'bg-[color:var(--accent-2)]/25 border-[color:var(--accent-2)]/40 text-violet-300'
-                                     : 'bg-[color:var(--accent)]/15 border-[color:var(--accent)]/30 text-pink-300';
+                    const tint = alt ? 'bg-[color:var(--accent-2)]/10 border-[color:var(--accent-2)]/25 text-violet-800'
+                                     : 'bg-[color:var(--accent)]/10 border-[color:var(--accent)]/25 text-pink-700';
                     return `<div class="glass-panel rounded-2xl p-4 h-40 flex flex-col items-center justify-center text-center gap-3">
                         <div class="w-11 h-11 rounded-xl border flex items-center justify-center text-lg ${tint}"><i class="fa-solid ${icon}"></i></div>
-                        <span class="text-sm font-medium text-slate-200 leading-snug">${label}</span>
+                        <span class="text-sm font-medium text-slate-800 leading-snug">${label}</span>
                     </div>`;
                 }).join('');
 
                 dots.innerHTML = Array.from({length: total}, (_, i) =>
-                    `<span class="h-1.5 rounded-full transition-all duration-300 ${i === page ? 'w-6 btn-primary' : 'w-1.5 bg-white/20'}"></span>`
+                    `<span class="h-1.5 rounded-full transition-all duration-300 ${i === page ? 'w-6 btn-primary' : 'w-1.5 bg-slate-900/15'}"></span>`
                 ).join('');
 
                 prev.disabled = page === 0;
@@ -542,108 +519,420 @@
             render(false);
         })();
 
-        /* ===================== 3D SCENE ===================== */
-        gsap.registerPlugin(ScrollTrigger);
+        /* ===================== HERO ANIMATION: GROWTH ENGINE =====================
+           Bars grow (business growth) → a trend arrow climbs above them (results)
+           → a target pulses (the right audience) → leads stream into it
+           → coins float up (real sales). Renders only while the hero is on screen. */
+        (function(){
+            const wrap = document.getElementById('hero-3d');
+            const hero = document.getElementById('hero');
+            if (!wrap || !hero || typeof THREE === 'undefined') return;
 
-        const container = document.getElementById('webgl-container');
-        const scene = new THREE.Scene();
-        scene.fog = new THREE.FogExp2(0x05060a, 0.03);
+            let renderer;
+            try {
+                renderer = new THREE.WebGLRenderer({ antialias:true, alpha:true, powerPreference:'high-performance' });
+            } catch (err) { wrap.style.display = 'none'; return; }
 
-        const camera = new THREE.PerspectiveCamera(60, innerWidth/innerHeight, 0.1, 1000);
-        camera.position.set(0, 0, 7);
+            const reduceMotion = matchMedia('(prefers-reduced-motion: reduce)').matches;
+            const clamp = (x, a = 0, b = 1) => Math.min(b, Math.max(a, x));
+            const easeOut = x => 1 - Math.pow(1 - x, 3);
+            const easeInOut = x => x < 0.5 ? 4*x*x*x : 1 - Math.pow(-2*x + 2, 3) / 2;
 
-        const renderer = new THREE.WebGLRenderer({ antialias:true, alpha:true, powerPreference:"high-performance" });
-        renderer.setSize(innerWidth, innerHeight);
-        renderer.setPixelRatio(Math.min(devicePixelRatio, 2));
-        renderer.toneMapping = THREE.ACESFilmicToneMapping;
-        renderer.toneMappingExposure = 1.1;
-        container.appendChild(renderer.domElement);
+            renderer.setPixelRatio(Math.min(devicePixelRatio, 2));
+            renderer.setClearColor(0x000000, 0);
+            renderer.toneMapping = THREE.ACESFilmicToneMapping;
+            renderer.toneMappingExposure = 1.15;
+            renderer.domElement.style.cssText = 'display:block;width:100%;height:100%';
+            wrap.appendChild(renderer.domElement);
 
-        const group = new THREE.Group();
-        group.scale.set(0.75, 0.75, 0.75);
-        scene.add(group);
+            const scene = new THREE.Scene();
+            scene.fog = new THREE.Fog(0xffffff, 16, 30);
+            const camera = new THREE.PerspectiveCamera(40, 1, 0.1, 100);
 
-        const coreMat = new THREE.MeshPhysicalMaterial({
-            color: 0xbe185d, emissive: 0x1a0510, roughness: 0.15, metalness: 0.75,
-            clearcoat: 1.0, clearcoatRoughness: 0.15, flatShading: true, transparent: true, opacity: 0.88
-        });
-        const coreMesh = new THREE.Mesh(new THREE.TorusKnotGeometry(1.6, 0.4, 170, 28, 2, 3), coreMat);
-        group.add(coreMesh);
+            const PINK = 0xec4899, VIOLET = 0x7c3aed;
 
-        const shellMat = new THREE.LineBasicMaterial({ color: 0x7c3aed, transparent: true, opacity: 0.28 });
-        const outerWireframe = new THREE.LineSegments(new THREE.WireframeGeometry(new THREE.IcosahedronGeometry(3.1, 1)), shellMat);
-        group.add(outerWireframe);
+            /* soft round glow texture (sprites, particles, floor light) */
+            const glowTex = (() => {
+                const c = document.createElement('canvas'); c.width = c.height = 64;
+                const g = c.getContext('2d');
+                const gr = g.createRadialGradient(32, 32, 0, 32, 32, 32);
+                gr.addColorStop(0, 'rgba(255,255,255,1)');
+                gr.addColorStop(0.25, 'rgba(255,255,255,0.55)');
+                gr.addColorStop(1, 'rgba(255,255,255,0)');
+                g.fillStyle = gr; g.fillRect(0, 0, 64, 64);
+                return new THREE.CanvasTexture(c);
+            })();
 
-        const particleCount = 420;
-        const positions = new Float32Array(particleCount*3);
-        const colors = new Float32Array(particleCount*3);
-        const cA = new THREE.Color(0xec4899), cB = new THREE.Color(0x8b5cf6), cW = new THREE.Color(0xe6ecf5);
-        for (let i=0; i<particleCount*3; i+=3){
-            positions[i]=(Math.random()-0.5)*22; positions[i+1]=(Math.random()-0.5)*22; positions[i+2]=(Math.random()-0.5)*22;
-            const c = Math.random() < 0.45 ? cA : (Math.random() < 0.8 ? cB : cW);
-            colors[i]=c.r; colors[i+1]=c.g; colors[i+2]=c.b;
-        }
-        const particleGeo = new THREE.BufferGeometry();
-        particleGeo.setAttribute('position', new THREE.BufferAttribute(positions,3));
-        particleGeo.setAttribute('color', new THREE.BufferAttribute(colors,3));
-        const particles = new THREE.Points(particleGeo, new THREE.PointsMaterial({ size:0.035, vertexColors:true, transparent:true, opacity:0.5, blending:THREE.AdditiveBlending }));
-        scene.add(particles);
+            const chart = new THREE.Group();
+            chart.rotation.y = -0.42;
+            scene.add(chart);
 
-        scene.add(new THREE.AmbientLight(0xffffff, 0.35));
-        const lightA = new THREE.PointLight(0xec4899, 2.4, 30); lightA.position.set(6,6,6); scene.add(lightA);
-        const lightB = new THREE.PointLight(0x8b5cf6, 2.2, 30); lightB.position.set(-6,-5,-4); scene.add(lightB);
-        const lightC = new THREE.PointLight(0xffffff, 0.9, 25); lightC.position.set(0,2,9); scene.add(lightC);
+            /* ---------- floor: soft light + radar rings ---------- */
+            const floorGlow = new THREE.Mesh(
+                new THREE.PlaneGeometry(11, 11),
+                new THREE.MeshBasicMaterial({ map:glowTex, color:0xec4899, transparent:true, opacity:0.14,
+                    depthWrite:false, toneMapped:false })
+            );
+            floorGlow.rotation.x = -Math.PI / 2;
+            floorGlow.position.y = -0.01;
+            chart.add(floorGlow);
 
-        let mouseX=0, mouseY=0, tX=0, tY=0;
-        const glow = document.getElementById('cursor-glow');
-        document.addEventListener('mousemove', e => {
-            mouseX = (e.clientX - innerWidth/2) * 0.0007;
-            mouseY = (e.clientY - innerHeight/2) * 0.0007;
-            glow.style.left = e.clientX + 'px';
-            glow.style.top = e.clientY + 'px';
-        });
-
-        const coreProxy = { r:0.745, g:0.094, b:0.365 };
-        const shellProxy = { r:0.486, g:0.227, b:0.929 };
-        function sync(){ coreMat.color.setRGB(coreProxy.r, coreProxy.g, coreProxy.b); shellMat.color.setRGB(shellProxy.r, shellProxy.g, shellProxy.b); }
-
-        const tl = gsap.timeline({ scrollTrigger: { trigger: "body", start:"top top", end:"bottom bottom", scrub:2.2 } });
-        tl.to(group.position, { x:2.6, y:-0.5, z:0.4 }, 0)
-          .to(group.rotation, { x:Math.PI*0.4, y:Math.PI*0.6 }, 0)
-          .to(coreProxy, { r:0.486, g:0.227, b:0.929, onUpdate:sync }, 0.3)
-          .to(shellProxy, { r:0.745, g:0.094, b:0.365, onUpdate:sync }, 0.3)
-          .to(group.position, { x:-2.4, y:0.3, z:1.0 }, 0.55)
-          .to(group.scale, { x:1.3, y:1.3, z:1.3 }, 0.55)
-          .to(group.position, { x:0, y:-1.0, z:-1.6 }, 1)
-          .to(group.scale, { x:1.9, y:1.9, z:1.9 }, 1);
-
-        gsap.utils.toArray('.gs-reveal').forEach(el => {
-            gsap.fromTo(el, { opacity:0, y:36 }, {
-                opacity:1, y:0, duration:1, ease:"power3.out",
-                scrollTrigger: { trigger: el, start:"top 88%", toggleActions:"play none none reverse" }
+            [[2.6, 0.55], [3.7, 0.35], [4.6, 0.2]].forEach(([r, o]) => {
+                const ring = new THREE.Mesh(
+                    new THREE.RingGeometry(r - 0.012, r, 128),
+                    new THREE.MeshBasicMaterial({ color:VIOLET, transparent:true, opacity:o, side:THREE.DoubleSide, depthWrite:false, toneMapped:false })
+                );
+                ring.rotation.x = -Math.PI / 2;
+                chart.add(ring);
             });
-        });
 
-        addEventListener('resize', () => {
-            camera.aspect = innerWidth/innerHeight;
-            camera.updateProjectionMatrix();
-            renderer.setSize(innerWidth, innerHeight);
-        });
+            /* ---------- growth bars ---------- */
+            const heights = [1.0, 1.6, 1.4, 2.4, 3.1, 4.0];
+            const cLow = new THREE.Color(VIOLET), cHigh = new THREE.Color(PINK);
+            const edgeGeo = new THREE.EdgesGeometry(new THREE.BoxGeometry(1, 1, 1));
+            const bars = heights.map((h, i) => {
+                const col = cLow.clone().lerp(cHigh, i / (heights.length - 1));
+                const mesh = new THREE.Mesh(
+                    new THREE.BoxGeometry(1, 1, 1),
+                    new THREE.MeshPhysicalMaterial({
+                        color: col, emissive: col.clone().multiplyScalar(0.28),
+                        roughness: 0.3, metalness: 0.35, clearcoat: 1, clearcoatRoughness: 0.2,
+                        transparent: true, opacity: 0.93
+                    })
+                );
+                mesh.add(new THREE.LineSegments(edgeGeo, new THREE.LineBasicMaterial({ color:0xffffff, transparent:true, opacity:0.28 })));
+                mesh.position.x = -3 + i * 1.2;
+                mesh.scale.set(0.8, 0.001, 0.8);
+                chart.add(mesh);
+                return { mesh, h };
+            });
 
-        const clock = new THREE.Clock();
-        function animate(){
-            requestAnimationFrame(animate);
-            const t = clock.getElapsedTime();
-            coreMesh.rotation.x = t*0.16; coreMesh.rotation.y = t*0.22;
-            outerWireframe.rotation.x = -t*0.08; outerWireframe.rotation.z = t*0.11;
-            particles.rotation.y = t*0.015;
-            tX += (mouseX-tX)*0.05; tY += (mouseY-tY)*0.05;
-            scene.rotation.y = tX; scene.rotation.x = tY;
-            renderer.render(scene, camera);
-        }
-        gsap.to(coreMesh.scale, { x:1.06, y:1.06, z:1.06, duration:3.4, repeat:-1, yoyo:true, ease:"sine.inOut" });
-        sync();
-        animate();
+            /* ---------- trend arrow ---------- */
+            const trendCurve = new THREE.CatmullRomCurve3([
+                new THREE.Vector3(-3.5, 1.2, 0.2),
+                new THREE.Vector3(-1.8, 2.3, 0.2),
+                new THREE.Vector3(-0.6, 2.1, 0.2),
+                new THREE.Vector3( 0.6, 3.2, 0.2),
+                new THREE.Vector3( 1.8, 3.9, 0.2),
+                new THREE.Vector3( 3.4, 5.0, 0.2)
+            ], false, 'centripetal');
+
+            const TUBE_SEG = 120, TUBE_RAD = 8;
+            const trendGeo = new THREE.TubeGeometry(trendCurve, TUBE_SEG, 0.055, TUBE_RAD, false);
+            {
+                const c1 = new THREE.Color(VIOLET), c2 = new THREE.Color(PINK), c3 = new THREE.Color(0xbe185d);
+                const cols = new Float32Array((TUBE_SEG + 1) * (TUBE_RAD + 1) * 3);
+                for (let i = 0; i <= TUBE_SEG; i++) {
+                    const s = i / TUBE_SEG;
+                    const c = s < 0.7 ? c1.clone().lerp(c2, s / 0.7) : c2.clone().lerp(c3, (s - 0.7) / 0.3);
+                    for (let j = 0; j <= TUBE_RAD; j++) {
+                        const k = (i * (TUBE_RAD + 1) + j) * 3;
+                        cols[k] = c.r; cols[k+1] = c.g; cols[k+2] = c.b;
+                    }
+                }
+                trendGeo.setAttribute('color', new THREE.BufferAttribute(cols, 3));
+            }
+            const trendMat = new THREE.MeshBasicMaterial({ vertexColors:true, transparent:true, toneMapped:false });
+            const trend = new THREE.Mesh(trendGeo, trendMat);
+            trendGeo.setDrawRange(0, 0);
+            chart.add(trend);
+
+            const ghost = new THREE.Line(
+                new THREE.BufferGeometry().setFromPoints(trendCurve.getPoints(160)),
+                new THREE.LineBasicMaterial({ color:VIOLET, transparent:true, opacity:0.4, toneMapped:false })
+            );
+            chart.add(ghost);
+
+            const head = new THREE.Mesh(
+                new THREE.ConeGeometry(0.2, 0.55, 20),
+                new THREE.MeshBasicMaterial({ color:0xbe185d, transparent:true, toneMapped:false })
+            );
+            chart.add(head);
+            const headGlow = new THREE.Sprite(new THREE.SpriteMaterial({
+                map:glowTex, color:0xec4899, transparent:true, depthWrite:false, toneMapped:false
+            }));
+            headGlow.scale.set(1.7, 1.7, 1);
+            chart.add(headGlow);
+            const UP = new THREE.Vector3(0, 1, 0);
+
+            /* ---------- audience target ---------- */
+            const T = new THREE.Vector3(-1.9, 4.5, -2.0);
+            const target = new THREE.Group();
+            target.position.copy(T);
+            chart.add(target);
+
+            const ringMat = (color, opacity) => new THREE.MeshBasicMaterial({ color, transparent:true, opacity, toneMapped:false });
+            const outerArc = new THREE.Mesh(new THREE.TorusGeometry(1.3, 0.035, 12, 96, Math.PI * 1.6), ringMat(VIOLET, 0.95));
+            const midArc   = new THREE.Mesh(new THREE.TorusGeometry(0.88, 0.03, 12, 80, Math.PI * 1.35), ringMat(PINK, 0.9));
+            const innerRing = new THREE.Mesh(new THREE.TorusGeometry(0.48, 0.03, 12, 64), ringMat(VIOLET, 0.9));
+            const bullseye = new THREE.Mesh(new THREE.SphereGeometry(0.17, 20, 20), new THREE.MeshBasicMaterial({ color:0xec4899, toneMapped:false }));
+            const bullseyeGlow = new THREE.Sprite(new THREE.SpriteMaterial({
+                map:glowTex, color:PINK, transparent:true, opacity:0.35, depthWrite:false, toneMapped:false
+            }));
+            bullseyeGlow.scale.set(1.5, 1.5, 1);
+            target.add(outerArc, midArc, innerRing, bullseye, bullseyeGlow);
+
+            const pulses = [0, 1].map(() => {
+                const p = new THREE.Mesh(new THREE.TorusGeometry(1, 0.012, 8, 96), ringMat(PINK, 0));
+                target.add(p);
+                return p;
+            });
+
+            /* ---------- leads streaming into the target ---------- */
+            const LEADS = 64;
+            const leadPos = new Float32Array(LEADS * 3);
+            const leadCol = new Float32Array(LEADS * 3);
+            const leadAlpha = new Float32Array(LEADS);
+            const leadS = [], leadC = [], leadTint = [];
+            const leadU = new Float32Array(LEADS), leadV = new Float32Array(LEADS);
+            const tints = [new THREE.Color(0xec4899), new THREE.Color(0x8b5cf6), new THREE.Color(0xbe185d)];
+
+            function spawnLead(i, u0){
+                const a = Math.random() * Math.PI * 2, r = 2.8 + Math.random() * 1.8;
+                const s = new THREE.Vector3(
+                    clamp(T.x + Math.cos(a) * r * 1.2, -4.9, 4.9),
+                    clamp(T.y + Math.sin(a) * r, 0.8, 7.2),
+                    T.z + (Math.random() - 0.5) * 3
+                );
+                leadS[i] = s;
+                leadC[i] = s.clone().lerp(T, 0.5).add(new THREE.Vector3((Math.random() - 0.5) * 1.6, 0.6 + Math.random() * 1.2, 0.8));
+                leadTint[i] = tints[(Math.random() * tints.length) | 0];
+                leadCol[i*3] = leadTint[i].r; leadCol[i*3+1] = leadTint[i].g; leadCol[i*3+2] = leadTint[i].b;
+                leadU[i] = u0;
+                leadV[i] = 0.14 + Math.random() * 0.16;
+            }
+            for (let i = 0; i < LEADS; i++) spawnLead(i, Math.random());
+
+            // round, soft dots with per-point colour + alpha (normal blending, so they read on white)
+            const pointMats = [];
+            function makePointsMat(size, opacity){
+                const m = new THREE.ShaderMaterial({
+                    uniforms: { uMap:{ value:glowTex }, uSize:{ value:size }, uScale:{ value:300 }, uOpacity:{ value:opacity } },
+                    vertexShader: `
+                        attribute float aAlpha; attribute vec3 aColor;
+                        uniform float uSize; uniform float uScale;
+                        varying float vA; varying vec3 vC;
+                        void main(){
+                            vA = aAlpha; vC = aColor;
+                            vec4 mv = modelViewMatrix * vec4(position, 1.0);
+                            gl_PointSize = uSize * uScale / -mv.z;
+                            gl_Position = projectionMatrix * mv;
+                        }`,
+                    fragmentShader: `
+                        uniform sampler2D uMap; uniform float uOpacity;
+                        varying float vA; varying vec3 vC;
+                        void main(){
+                            float a = texture2D(uMap, gl_PointCoord).a * vA * uOpacity;
+                            gl_FragColor = vec4(vC, a);
+                        }`,
+                    transparent: true, depthWrite: false
+                });
+                pointMats.push(m);
+                return m;
+            }
+
+            const leadGeo = new THREE.BufferGeometry();
+            leadGeo.setAttribute('position', new THREE.BufferAttribute(leadPos, 3));
+            leadGeo.setAttribute('aColor', new THREE.BufferAttribute(leadCol, 3));
+            leadGeo.setAttribute('aAlpha', new THREE.BufferAttribute(leadAlpha, 1));
+            const leads = new THREE.Points(leadGeo, makePointsMat(0.3, 1));
+            leads.frustumCulled = false;
+            chart.add(leads);
+
+            /* ---------- rising sparkles ---------- */
+            const DUST = 90;
+            const dustPos = new Float32Array(DUST * 3), dustCol = new Float32Array(DUST * 3), dustSpd = new Float32Array(DUST), dustAlpha = new Float32Array(DUST);
+            const dustTints = [new THREE.Color(PINK), new THREE.Color(VIOLET), new THREE.Color(0xa78bfa)];
+            for (let i = 0; i < DUST; i++) {
+                const a = Math.random() * Math.PI * 2, r = Math.sqrt(Math.random()) * 4.2;
+                dustPos[i*3] = Math.cos(a) * r; dustPos[i*3+1] = Math.random() * 7; dustPos[i*3+2] = Math.sin(a) * r;
+                dustSpd[i] = 0.15 + Math.random() * 0.3;
+                const c = dustTints[(Math.random() * dustTints.length) | 0];
+                dustCol[i*3] = c.r; dustCol[i*3+1] = c.g; dustCol[i*3+2] = c.b;
+            }
+            const dustGeo = new THREE.BufferGeometry();
+            dustGeo.setAttribute('position', new THREE.BufferAttribute(dustPos, 3));
+            dustGeo.setAttribute('aColor', new THREE.BufferAttribute(dustCol, 3));
+            dustGeo.setAttribute('aAlpha', new THREE.BufferAttribute(dustAlpha, 1));
+            const dust = new THREE.Points(dustGeo, makePointsMat(0.12, 0.75));
+            dust.frustumCulled = false;
+            chart.add(dust);
+
+            /* ---------- revenue coins ---------- */
+            const coinMat = new THREE.MeshStandardMaterial({ color:0xec4899, emissive:0x4a0d2a, metalness:0.6, roughness:0.3 });
+            const coinRimMat = new THREE.MeshBasicMaterial({ color:0xffffff, transparent:true, opacity:0.65, toneMapped:false });
+            const coins = [
+                { r:0.40, x:2.0, y:5.5, z:0.8,  spin:1.3 },
+                { r:0.30, x:3.6, y:6.2, z:-0.3, spin:-1.7 },
+                { r:0.26, x:0.7, y:6.1, z:0.3,  spin:1.9 }
+            ].map((c, i) => {
+                const geo = new THREE.CylinderGeometry(c.r, c.r, 0.07, 40);
+                geo.rotateX(Math.PI / 2);
+                const mesh = new THREE.Mesh(geo, coinMat);
+                [0.038, -0.038].forEach(z => {
+                    const rim = new THREE.Mesh(new THREE.TorusGeometry(c.r * 0.72, 0.012, 8, 48), coinRimMat);
+                    rim.position.z = z;
+                    mesh.add(rim);
+                });
+                mesh.position.set(c.x, c.y, c.z);
+                mesh.scale.setScalar(0.001);
+                chart.add(mesh);
+                return { mesh, ...c, i };
+            });
+
+            /* ---------- lights ---------- */
+            scene.add(new THREE.AmbientLight(0xffffff, 0.55));
+            const lightA = new THREE.PointLight(PINK, 2.2, 40);   lightA.position.set(6, 7, 7);   scene.add(lightA);
+            const lightB = new THREE.PointLight(VIOLET, 2.0, 40); lightB.position.set(-6, 3, 5);  scene.add(lightB);
+            const lightC = new THREE.PointLight(0xffffff, 0.8, 40); lightC.position.set(0, 5, 10); scene.add(lightC);
+
+            /* ---------- pointer parallax ---------- */
+            let mx = 0, my = 0, tx = 0, ty = 0;
+            hero.addEventListener('pointermove', e => {
+                const r = hero.getBoundingClientRect();
+                mx = ((e.clientX - r.left) / r.width - 0.5) * 2;
+                my = ((e.clientY - r.top) / r.height - 0.5) * 2;
+            });
+
+            /* ---------- per-frame update ---------- */
+            const tmpTan = new THREE.Vector3(), tmpPt = new THREE.Vector3();
+
+            function update(t, dt, still){
+                // bars: grow in once, then breathe like live data
+                bars.forEach((b, i) => {
+                    const g = still ? 1 : easeOut(clamp((t - 0.3 - i * 0.18) / 1.1));
+                    const breath = still ? 1 : 1 + 0.05 * Math.sin(t * 0.9 + i * 0.9) * g;
+                    const h = Math.max(0.001, b.h * g * breath);
+                    b.mesh.scale.y = h;
+                    b.mesh.position.y = h / 2;
+                });
+
+                // trend arrow: draws left → right, holds, fades, repeats
+                let prog = 0, fade = 0;
+                if (still) { prog = 1; fade = 1; }
+                else if (t > 1.8) {
+                    const c = (t - 1.8) % 6;
+                    prog = easeInOut(clamp(c / 3.4));
+                    fade = c < 4.6 ? 1 : clamp(1 - (c - 4.6) / 1.0);
+                }
+                trendGeo.setDrawRange(0, Math.floor(prog * TUBE_SEG) * TUBE_RAD * 6);
+                trendMat.opacity = fade;
+                const showHead = prog > 0.01 && fade > 0.01;
+                head.visible = headGlow.visible = showHead;
+                if (showHead) {
+                    const u = clamp(prog, 0.001, 0.999);
+                    trendCurve.getPointAt(u, tmpPt);
+                    trendCurve.getTangentAt(u, tmpTan);
+                    head.position.copy(tmpPt).addScaledVector(tmpTan, 0.15);
+                    head.quaternion.setFromUnitVectors(UP, tmpTan);
+                    headGlow.position.copy(tmpPt);
+                    head.material.opacity = fade;
+                    headGlow.material.opacity = fade * 0.4;
+                }
+
+                // target: rotating aim arcs + sonar pulses
+                const tIn = still ? 1 : easeOut(clamp((t - 0.9) / 1.2));
+                target.scale.setScalar(Math.max(0.001, tIn));
+                outerArc.rotation.z = t * 0.6;
+                midArc.rotation.z = -t * 0.9;
+                bullseyeGlow.material.opacity = 0.32 + 0.14 * Math.sin(t * 2.4);
+                pulses.forEach((p, k) => {
+                    const ph = (t * 0.45 + k * 0.5) % 1;
+                    p.scale.setScalar(0.35 + ph * 1.25);
+                    p.material.opacity = (1 - ph) * 0.55 * tIn;
+                });
+
+                // leads converge on the target
+                for (let i = 0; i < LEADS; i++) {
+                    if (dt > 0) {
+                        leadU[i] += dt * leadV[i];
+                        if (leadU[i] >= 1) spawnLead(i, 0);
+                    }
+                    const u = leadU[i], e = Math.pow(u, 1.6), m = 1 - e;
+                    const S = leadS[i], C = leadC[i];
+                    leadPos[i*3]   = m*m*S.x + 2*m*e*C.x + e*e*T.x;
+                    leadPos[i*3+1] = m*m*S.y + 2*m*e*C.y + e*e*T.y;
+                    leadPos[i*3+2] = m*m*S.z + 2*m*e*C.z + e*e*T.z;
+                    leadAlpha[i] = clamp(u * 6) * (1 - clamp((u - 0.82) / 0.18)) * tIn;
+                }
+                leadGeo.attributes.position.needsUpdate = true;
+                leadGeo.attributes.aColor.needsUpdate = true;
+                leadGeo.attributes.aAlpha.needsUpdate = true;
+
+                // sparkles drift upward
+                for (let i = 0; i < DUST; i++) {
+                    if (dt > 0) {
+                        dustPos[i*3+1] += dt * dustSpd[i];
+                        if (dustPos[i*3+1] > 7) dustPos[i*3+1] = 0.1;
+                    }
+                    const y = dustPos[i*3+1];
+                    dustAlpha[i] = clamp(y / 0.8) * (1 - clamp((y - 5.5) / 1.5));
+                }
+                dustGeo.attributes.position.needsUpdate = true;
+                dustGeo.attributes.aAlpha.needsUpdate = true;
+
+                // coins spin and bob once the chart has landed
+                coins.forEach(c => {
+                    const s = still ? 1 : easeOut(clamp((t - 2.0 - c.i * 0.25) / 0.7));
+                    c.mesh.scale.setScalar(Math.max(0.001, s));
+                    c.mesh.rotation.y = t * c.spin + c.i;
+                    c.mesh.rotation.x = 0.25 * Math.sin(t * 0.8 + c.i);
+                    c.mesh.position.y = c.y + Math.sin(t * 1.2 + c.i * 2) * 0.18;
+                });
+
+                // gentle sway + pointer parallax
+                tx += (mx - tx) * 0.05; ty += (my - ty) * 0.05;
+                chart.rotation.y = -0.42 + Math.sin(t * 0.25) * 0.1 + tx * 0.18;
+                chart.rotation.x = 0.04 + ty * 0.06;
+            }
+
+            /* ---------- sizing (fits the chart to the container width) ---------- */
+            function resize(){
+                const w = wrap.clientWidth || 1, h = wrap.clientHeight || 1;
+                renderer.setSize(w, h, false);
+                pointMats.forEach(m => { m.uniforms.uScale.value = h * 0.5 * renderer.getPixelRatio(); });
+                camera.aspect = w / h;
+                camera.updateProjectionMatrix();
+                const tanHalf = Math.tan(THREE.MathUtils.degToRad(camera.fov / 2));
+                const dist = Math.max(11.5, 5.5 / (camera.aspect * tanHalf));
+                camera.position.set(0, 4.4, dist);
+                camera.lookAt(0, 2.7, 0);
+                scene.fog.near = dist + 3;
+                scene.fog.far = dist + 16;
+                if (reduceMotion) renderer.render(scene, camera);
+            }
+            new ResizeObserver(resize).observe(wrap);
+            resize();
+
+            /* ---------- run loop ---------- */
+            if (reduceMotion) {
+                // respect reduced-motion: one finished, static frame
+                update(20, 0, true);
+                renderer.render(scene, camera);
+                return;
+            }
+
+            let t = 0, last = 0, raf = 0, heroVisible = true;
+            function frame(now){
+                raf = requestAnimationFrame(frame);
+                const dt = Math.min((now - last) / 1000, 0.05);
+                last = now; t += dt;
+                update(t, dt, false);
+                renderer.render(scene, camera);
+            }
+            function start(){ if (!raf) { last = performance.now(); raf = requestAnimationFrame(frame); } }
+            function stop(){ if (raf) { cancelAnimationFrame(raf); raf = 0; } }
+
+            // only animate while the hero is on screen and the tab is visible
+            new IntersectionObserver(([entry]) => {
+                heroVisible = entry.isIntersecting;
+                heroVisible && !document.hidden ? start() : stop();
+            }, { threshold: 0 }).observe(hero);
+            document.addEventListener('visibilitychange', () => {
+                document.hidden || !heroVisible ? stop() : start();
+            });
+            start();
+        })();
     </script>
 </body>
 </html>
